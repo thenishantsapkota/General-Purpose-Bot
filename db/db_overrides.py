@@ -1,11 +1,18 @@
-from modules.imports import *
+#from modules.imports import *
 
+from sqlalchemy import create_engine
+from sqlalchemy import Column
+from sqlalchemy import String,Integer
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-engine = create_engine("sqlite:///D:\Python Programming\General-Bot\db\database.db")
+engine = create_engine(
+    "sqlite:///D:\Python Programming\General-Bot\db\database.db")
 Session = sessionmaker(bind=engine)
-session =Session()
+session = Session()
 
 Base = declarative_base()
+
 
 class Overrides(Base):
 
@@ -13,12 +20,12 @@ class Overrides(Base):
 
     id = Column(Integer, primary_key=True)
     channel_id = Column(Integer)
-    guild_id = Column(Integer)
-    cmd = Column(String)
-    bool = Column(Integer)
 
-    def __init__(self, channel_id, guild_id, cmd, bool):
+    def __init__(self, channel_id):
         self.channel_id = channel_id
-        self.guild_id = guild_id
-        self.cmd = cmd
-        self.bool = bool
+
+
+channel_ids = []
+
+for r in session.query(Overrides):
+    channel_ids += [r.channel_id]

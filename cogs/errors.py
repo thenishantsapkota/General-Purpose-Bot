@@ -1,5 +1,6 @@
 from modules.imports import *
 
+
 class Error(Cog):
 
     def __init__(self, client):
