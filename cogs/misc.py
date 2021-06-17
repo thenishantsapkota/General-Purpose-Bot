@@ -53,7 +53,7 @@ class Misc(Cog):
         await ctx.send(embed=embed)
 
     @command(name="userinfo")
-    async def userinfo_command(self, ctx, member:Optional[Member]):
+    async def userinfo_command(self, ctx, member: Optional[Member]):
         member = member or ctx.author
         member_avatar = member.avatar_url
         id = member.id

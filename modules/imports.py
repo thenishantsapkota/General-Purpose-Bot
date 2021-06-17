@@ -1,8 +1,8 @@
 import discord
-from discord import Color,DMChannel,Embed,Member,User,TextChannel,VoiceChannel
-from discord.ext import commands,tasks
+from discord import Color, DMChannel, Embed, Member, User, TextChannel, VoiceChannel
+from discord.ext import commands, tasks
 from discord.utils import get
-from discord.ext.commands import Cog,command,Greedy
+from discord.ext.commands import Cog, command, Greedy
 from discord.ext.menus import MenuPages, ListPageSource
 import jishaku
 
@@ -19,7 +19,7 @@ import asyncio
 
 from sqlalchemy import create_engine
 from sqlalchemy import Column
-from sqlalchemy import String,Integer
+from sqlalchemy import String, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
