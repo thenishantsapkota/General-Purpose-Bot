@@ -40,6 +40,7 @@ class OnMemberJoinModel(Model):
     class Meta:
         table = "onMemberJoin"
         table_description = "Stores the Welcome channel and Welcome Message of the bot."
+        
 
 
 class TokenModel(Model):
