@@ -9,7 +9,7 @@ class WelcomeMessage(Cog):
     @command()
     @commands.has_permissions(manage_guild=True)
     async def setwelcome(self, ctx, channel: TextChannel):
-        model = await WelcomeModel.get_or_none(guild_id = ctx.guild.id)
+        model = await WelcomeModel.get_or_none(guild_id=ctx.guild.id)
         model.channel_id = channel.id
         await model.save()
         embed = Embed(
@@ -23,7 +23,7 @@ class WelcomeMessage(Cog):
     @command()
     @commands.has_permissions(manage_guild=True)
     async def setwelcomemessage(self, ctx, *, welcomeMessage: Optional[str]):
-        welcome = await WelcomeModel.get_or_none(guild_id = ctx.guild.id)
+        welcome = await WelcomeModel.get_or_none(guild_id=ctx.guild.id)
         welcome.welcome_message = welcomeMessage
         await welcome.save()
         embed = Embed(
@@ -37,7 +37,7 @@ class WelcomeMessage(Cog):
     @Cog.listener()
     async def on_member_join(self, member):
         default = "Enjoy your stay here."
-        query = await WelcomeModel.get_or_none(guild_id = member.guild.id)
+        query = await WelcomeModel.get_or_none(guild_id=member.guild.id)
         message = query.welcome_message
         guild = self.client.get_guild(query.guild_id)
         channel = self.client.get_channel(query.channel_id)

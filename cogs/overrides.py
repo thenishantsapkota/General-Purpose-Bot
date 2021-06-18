@@ -7,7 +7,7 @@ class CmdOverrides(Cog):
         self.client = client
 
     @commands.group()
-    @commands.has_permissions(administrator = True)
+    @commands.has_permissions(administrator=True)
     async def toggle(
         self, ctx, command: str, channels: Greedy[TextChannel], toggle: bool
     ):
@@ -25,13 +25,14 @@ class CmdOverrides(Cog):
         else:
             for channel in channels:
                 model, _ = await OverrideModel.get_or_create(
-                    guild_id=ctx.guild.id, command_name=command.name, channel_id=channel.id
+                    guild_id=ctx.guild.id,
+                    command_name=command.name,
+                    channel_id=channel.id,
                 )
                 model.enable = toggle
                 await model.save()
             toggle_string = "enabled" if toggle else "disabled"
-            channel_mention = "".join(
-                [channel.mention for channel in channels])
+            channel_mention = "".join([channel.mention for channel in channels])
             await ctx.send(f"`{command.name}` {toggle_string} in {channel_mention}")
 
     @command()
