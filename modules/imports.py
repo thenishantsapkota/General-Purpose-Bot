@@ -1,5 +1,14 @@
 import discord
-from discord import Color, DMChannel, Embed, Member, User, TextChannel, VoiceChannel
+from discord import (
+    Color,
+    DMChannel,
+    Embed,
+    Member,
+    User,
+    TextChannel,
+    VoiceChannel,
+    Role,
+)
 from discord.ext import commands, tasks
 from discord.utils import get
 from discord.ext.commands import Cog, command, Greedy

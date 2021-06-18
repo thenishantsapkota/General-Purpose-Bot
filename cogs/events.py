@@ -1,5 +1,5 @@
 from modules.imports import *
-from models import PrefixModel, WelcomeModel
+from models import PrefixModel, OnMemberJoinModel
 
 
 class Events(Cog):
@@ -32,8 +32,11 @@ class Events(Cog):
     @Cog.listener()
     async def on_guild_join(self, guild):
         record, _ = await PrefixModel.get_or_create(guild_id=guild.id, prefix=">")
-        welcome, _ = await WelcomeModel.get_or_create(
-            channel_id=0, guild_id=guild.id, welcome_message="Enjoy your stay here."
+        welcome, _ = await OnMemberJoinModel.get_or_create(
+            channel_id=0,
+            guild_id=guild.id,
+            welcome_message="Enjoy your stay here.",
+            base_role_id=0,
         )
         await welcome.save()
         await record.save()
@@ -42,7 +45,7 @@ class Events(Cog):
     async def on_guild_remove(self, guild):
         record = await PrefixModel.get(guild_id=guild.id)
         await record.delete()
-        welcome = await WelcomeModel.get(guild_id=guild.id)
+        welcome = await OnMemberJoinModel.get(guild_id=guild.id)
         await welcome.delete()
 
 

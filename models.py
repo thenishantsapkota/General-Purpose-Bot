@@ -29,15 +29,16 @@ class PrefixModel(Model):
         table_description = "Stores Prefix of the bot."
 
 
-class WelcomeModel(Model):
+class OnMemberJoinModel(Model):
 
     id = fields.IntField(pk=True)
     channel_id = fields.BigIntField()
     guild_id = fields.BigIntField()
     welcome_message = fields.TextField()
+    base_role_id = fields.BigIntField()
 
     class Meta:
-        table = "welcomechannel"
+        table = "onMemberJoin"
         table_description = "Stores the Welcome channel and Welcome Message of the bot."
 
 

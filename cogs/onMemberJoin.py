@@ -1,5 +1,5 @@
 from modules.imports import *
-from models import WelcomeModel
+from models import OnMemberJoinModel
 
 
 class WelcomeMessage(Cog):
@@ -10,7 +10,7 @@ class WelcomeMessage(Cog):
     @commands.has_permissions(manage_guild=True)
     async def setwelcome(self, ctx, channel: Optional[TextChannel]):
         channel = channel or ctx.channel
-        model = await WelcomeModel.get_or_none(guild_id=ctx.guild.id)
+        model = await OnMemberJoinModel.get_or_none(guild_id=ctx.guild.id)
         model.channel_id = channel.id
         await model.save()
         embed = Embed(
@@ -24,7 +24,8 @@ class WelcomeMessage(Cog):
     @command()
     @commands.has_permissions(manage_guild=True)
     async def setwelcomemessage(self, ctx, *, welcomeMessage: Optional[str]):
-        welcome = await WelcomeModel.get_or_none(guild_id=ctx.guild.id)
+        default = "Enjoy your stay here."
+        welcome = await OnMemberJoinModel.get_or_none(guild_id=ctx.guild.id)
         welcome.welcome_message = welcomeMessage
         await welcome.save()
         embed = Embed(
@@ -35,13 +36,31 @@ class WelcomeMessage(Cog):
         )
         await ctx.send(embed=embed)
 
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def baserole(self, ctx, role: Role):
+        if role in ctx.guild.roles:
+            model = await OnMemberJoinModel.get_or_none(guild_id=ctx.guild.id)
+            model.base_role_id = role.id
+            await model.save()
+            embed = Embed(
+                title="Base Role",
+                description=f"The base role  for {ctx.guild.name} has been set to {role.mention}",
+                timestamp=datetime.utcnow(),
+                color=Color.blurple(),
+            )
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send("No such roles could be found.")
+
     @Cog.listener()
     async def on_member_join(self, member):
         default = "Enjoy your stay here."
-        query = await WelcomeModel.get_or_none(guild_id=member.guild.id)
+        query = await OnMemberJoinModel.get_or_none(guild_id=member.guild.id)
         message = query.welcome_message
         guild = self.client.get_guild(query.guild_id)
         channel = self.client.get_channel(query.channel_id)
+        base_role = discord.utils.get(member.guild.roles, id=query.base_role_id)
         try:
             if guild.get_member(member.id) is not None:
                 embed = Embed(
@@ -52,8 +71,12 @@ class WelcomeMessage(Cog):
                 )
                 embed.set_thumbnail(url=member.avatar_url)
                 await channel.send(member.mention, embed=embed)
+                try:
+                    await member.add_roles(base_role)
+                except:
+                    pass
         except:
-            print("Member not in server!")
+            pass
 
 
 def setup(client):
