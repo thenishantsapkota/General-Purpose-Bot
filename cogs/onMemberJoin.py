@@ -8,13 +8,14 @@ class WelcomeMessage(Cog):
 
     @command()
     @commands.has_permissions(manage_guild=True)
-    async def setwelcome(self, ctx, channel: TextChannel):
+    async def setwelcome(self, ctx, channel: Optional[TextChannel]):
+        channel = channel or ctx.channel
         model = await WelcomeModel.get_or_none(guild_id=ctx.guild.id)
         model.channel_id = channel.id
         await model.save()
         embed = Embed(
             title="Welcome Channel",
-            description=f"The welcome channel for {ctx.guild.name} has been set to {channel.mention}",
+            description=f"The welcome channel for {ctx.guild.name} has been set to {channel.mention if channel else None}",
             timestamp=datetime.utcnow(),
             color=Color.blurple(),
         )
