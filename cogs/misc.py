@@ -1,10 +1,8 @@
 from datetime import date
 from modules.imports import *
-from db.db_overrides import *
 
 
 class Misc(Cog):
-
     def __init__(self, client):
         self.client = client
 
@@ -15,7 +13,7 @@ class Misc(Cog):
         embed = Embed(
             title=f"Avatar - {member.name}",
             timestamp=datetime.utcnow(),
-            color=Color.blurple()
+            color=Color.blurple(),
         )
         embed.set_footer(text=f"Requested by {ctx.author.name}")
         embed.set_image(url=avatarUrl)
@@ -29,13 +27,12 @@ class Misc(Cog):
         memberCount = str(ctx.guild.member_count)
         textChannels = len(ctx.guild.text_channels)
         voiceChannels = len(ctx.guild.voice_channels)
-        guildCreatedate = ctx.guild.created_at.strftime(
-            "%a, %#d %B %Y, %I:%M %p")
+        guildCreatedate = ctx.guild.created_at.strftime("%a, %#d %B %Y, %I:%M %p")
 
         embed = Embed(
             title=f"Info of {ctx.guild.name} Server",
             color=Color.blurple(),
-            timestamp=datetime.utcnow()
+            timestamp=datetime.utcnow(),
         )
         embed.set_footer(text=f"Requested by {ctx.author.name}")
         embed.set_thumbnail(url=ctx.guild.icon_url)
@@ -46,7 +43,7 @@ class Misc(Cog):
             ("Member Count", memberCount, False),
             ("Text Channels", textChannels, False),
             ("Voice Channels", voiceChannels, False),
-            ("Created on", guildCreatedate, False)
+            ("Created on", guildCreatedate, False),
         ]
         for name, value, inline in fields:
             embed.add_field(name=name, value=value, inline=inline)
@@ -59,14 +56,13 @@ class Misc(Cog):
         id = member.id
         name = member.name
         accountAge = member.created_at.strftime("%a, %#d %B %Y, %I:%M %p UTC")
-        joinServerDate = member.joined_at.strftime(
-            "%a, %#d %B %Y, %I:%M %p UTC")
+        joinServerDate = member.joined_at.strftime("%a, %#d %B %Y, %I:%M %p UTC")
         highestRole = member.top_role.mention
 
         embed = Embed(
             title=f"User Info - {member.name}",
             timestamp=datetime.utcnow(),
-            color=Color.blurple()
+            color=Color.blurple(),
         )
         embed.set_footer(text=f"Requested by {ctx.author.name}")
         embed.set_thumbnail(url=member_avatar)
@@ -75,7 +71,7 @@ class Misc(Cog):
             ("Name", f"{name} #{ctx.author.discriminator}", False),
             ("Account Created on", accountAge, False),
             ("Joined Server on", joinServerDate, False),
-            ("Highest Role", highestRole, False)
+            ("Highest Role", highestRole, False),
         ]
         for name, value, inline in fields:
             embed.add_field(name=name, value=value, inline=inline)

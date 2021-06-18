@@ -2,7 +2,6 @@ from modules.imports import *
 
 
 class Error(Cog):
-
     def __init__(self, client):
         self.client = client
 
@@ -25,8 +24,7 @@ class Error(Cog):
                 re.compile(r"[A-Z][a-z]*").findall(error.__class__.__name__)
             )
             await ctx.reply(
-                embed=Embed(title=title, description=str(
-                    error), color=Color.red())
+                embed=Embed(title=title, description=str(error), color=Color.red())
             )
             raise error
 

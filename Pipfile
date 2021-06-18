@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+"discord.py" = "*"
+"discord.ext.menus" = "*"
+jishaku = "*"
+requests = "*"
+sqlalchemy = "*"
+tortoise-orm = "==0.17.4"
+aerich = "==0.5.3"
+watchdog = "*"
+watchgod = "*"
+
+[dev-packages]
+black = "*"
+
+[requires]
+python_version = "3.9"
+
+[pipenv]
+allow_prereleases = true

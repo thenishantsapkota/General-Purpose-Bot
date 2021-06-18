@@ -11,7 +11,6 @@ import io
 import os.path
 
 import requests
-from dotenv import load_dotenv
 from pathlib import Path
 
 import random
@@ -25,7 +24,7 @@ from sqlalchemy.orm import sessionmaker
 
 import json
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 import traceback
 import sys
 import re

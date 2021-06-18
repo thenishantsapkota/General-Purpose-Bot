@@ -1,54 +1,49 @@
-from db.db_welcome import WelcomeDB
-from db.db_overrides import Overrides
 from modules.imports import *
-from db.db_prefix import *
+from models import PrefixModel, WelcomeModel
+
 
 class Events(Cog):
-
     def __init__(self, client):
         self.client = client
 
     @Cog.listener()
     async def on_ready(self):
-        #print("Bot is Ready!")
+        # print("Bot is Ready!")
         print(f"Logged in as  - {self.client.user.name} active in...")
         for i in self.client.guilds:
             print(f"{i.name}")
-            await self.client.change_presence(activity=discord.Game(name="Visual Studio Code"))
-    
+            await self.client.change_presence(
+                activity=discord.Game(name="Visual Studio Code")
+            )
+
     @Cog.listener()
     async def on_message(self, msg):
         if self.client.user.mentioned_in(msg):
-            for prefix in session.query(BotPrefix).filter(BotPrefix.guild_id == msg.guild.id):
-                embed = Embed(
-                    title = "Prefix",
-                    description = f"My prefix for {msg.guild.name} is `{prefix.prefix_bot}`",
-                    timestamp = datetime.utcnow(),
-                    color = Color.blurple()
-                )
-                await msg.channel.send(embed = embed)
+            record = await PrefixModel.get_or_none(guild_id=msg.guild.id)
+            prefix = ">" if not record.prefix else record.prefix
+            embed = Embed(
+                title="Prefix",
+                description=f"The prefix for {msg.guild.name} is `{prefix}`.",
+                color=Color.blurple(),
+                timestamp=datetime.utcnow(),
+            )
+            await msg.channel.send(embed=embed)
+
     @Cog.listener()
-    async def on_guild_join(self,guild):
-        try:
-            guild_info = BotPrefix(">",guild.id)
-            welcomeInfo = WelcomeDB("0", guild.id,"Enjoy your stay here.")
-            session.add(guild_info)
-            session.add(welcomeInfo)
-            session.commit()
-            session.commit()
-        except:
-            pass
-    
+    async def on_guild_join(self, guild):
+        record, _ = await PrefixModel.get_or_create(guild_id=guild.id, prefix=">")
+        welcome, _ = await WelcomeModel.get_or_create(
+            channel_id=0, guild_id=guild.id, welcome_message="Enjoy your stay here."
+        )
+        await welcome.save()
+        await record.save()
+
     @Cog.listener()
     async def on_guild_remove(self, guild):
-        try:
-            session.query(BotPrefix).filter(BotPrefix.guild_id == guild.id).delete()
-            session.query(WelcomeDB).filter(WelcomeDB.guild_id == guild.id).delete()
-            session.commit()
-            session.commit()
-        except:
-            pass
-        
+        record = await PrefixModel.get(guild_id=guild.id)
+        await record.delete()
+        welcome = await WelcomeModel.get(guild_id=guild.id)
+        await welcome.delete()
 
 
 def setup(client):
