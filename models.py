@@ -1,6 +1,7 @@
 from tortoise.models import Model
 from tortoise import fields
 
+#Use this when adding new tables
 # aerich migrate
 # aerich upgrade
 
