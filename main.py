@@ -7,6 +7,7 @@ from tortoise_config import tortoise_config
 from models import OverrideModel
 from models import PrefixModel
 import watchgod
+import jishaku
 
 TOKEN = token
 
@@ -25,6 +26,7 @@ async def get_prefix(client, message):
 
 
 client = commands.Bot(command_prefix=get_prefix, intents=intents)
+client.load_extension("jishaku")
 for filename in os.listdir("./cogs"):
     if filename.endswith(".py"):
         client.load_extension(f"cogs.{filename[:-3]}")

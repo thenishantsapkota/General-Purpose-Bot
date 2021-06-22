@@ -1,5 +1,6 @@
 from datetime import date
 from modules.imports import *
+import aiohttp
 
 
 class Misc(Cog):
@@ -21,12 +22,13 @@ class Misc(Cog):
 
     @command(name="serverinfo")
     async def serverinfo_command(self, ctx):
-        owner = str(ctx.guild.owner)
+        owner = str(ctx.guild.owner.mention)
         id = str(ctx.guild.id)
         region = str(ctx.guild.region)
         memberCount = str(ctx.guild.member_count)
         textChannels = len(ctx.guild.text_channels)
         voiceChannels = len(ctx.guild.voice_channels)
+        roles = len(ctx.guild.roles)
         guildCreatedate = ctx.guild.created_at.strftime("%a, %#d %B %Y, %I:%M %p")
 
         embed = Embed(
@@ -37,13 +39,14 @@ class Misc(Cog):
         embed.set_footer(text=f"Requested by {ctx.author.name}")
         embed.set_thumbnail(url=ctx.guild.icon_url)
         fields = [
-            ("Owner", owner, False),
-            ("Server ID", id, False),
-            ("Server Region", region.capitalize(), False),
-            ("Member Count", memberCount, False),
-            ("Text Channels", textChannels, False),
-            ("Voice Channels", voiceChannels, False),
-            ("Created on", guildCreatedate, False),
+            ("Server ID", id, True),
+            ("Server Region", region.capitalize(), True),
+            ("Owner", owner, True),
+            ("Member Count", memberCount, True),
+            ("Text Channels", textChannels, True),
+            ("Voice Channels", voiceChannels, True),
+            ("Role Count", roles, True),
+            ("Created on", guildCreatedate, True),
         ]
         for name, value, inline in fields:
             embed.add_field(name=name, value=value, inline=inline)
@@ -59,6 +62,8 @@ class Misc(Cog):
         joinServerDate = member.joined_at.strftime("%a, %#d %B %Y, %I:%M %p UTC")
         highestRole = member.top_role.mention
 
+        info = "Server Owner" if ctx.guild.owner is ctx.author else "Member"
+
         embed = Embed(
             title=f"User Info - {member.name}",
             timestamp=datetime.utcnow(),
@@ -68,13 +73,56 @@ class Misc(Cog):
         embed.set_thumbnail(url=member_avatar)
         fields = [
             ("ID", id, False),
-            ("Name", f"{name} #{ctx.author.discriminator}", False),
-            ("Account Created on", accountAge, False),
-            ("Joined Server on", joinServerDate, False),
-            ("Highest Role", highestRole, False),
+            ("Name", f"{name} #{ctx.author.discriminator}", True),
+            ("Highest Role", highestRole, True),
+            ("Account Created on", accountAge, True),
+            ("Joined Server on", joinServerDate, True),
+            ("Additional Info", info, True),
         ]
         for name, value, inline in fields:
             embed.add_field(name=name, value=value, inline=inline)
+        await ctx.send(embed=embed)
+
+    @command(name="catfact")
+    async def catfact_command(self, ctx):
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://some-random-api.ml/facts/cat") as resp:
+                cat_fact = await resp.json()
+                fact = cat_fact["fact"]
+        embed = Embed(
+            color=Color.blurple(),
+            timestamp=datetime.utcnow(),
+            description=f"```{fact}```",
+        )
+        embed.set_author(
+            name="Here's a cat fact for you.", icon_url=ctx.author.avatar_url
+        )
+        embed.set_footer(text=f"Requested by {ctx.author.name}")
+        await ctx.send(embed=embed)
+
+    @command(name="dogfact")
+    async def dogfact_command(self, ctx):
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://some-random-api.ml/facts/dog") as resp:
+                dog_fact = await resp.json()
+                fact = dog_fact["fact"]
+        embed = Embed(
+            color=Color.blurple(),
+            timestamp=datetime.utcnow(),
+            description=f"```{fact}```",
+        )
+        embed.set_author(
+            name="Here's a dog fact for you.", icon_url=ctx.author.avatar_url
+        )
+        embed.set_footer(text=f"Requested by {ctx.author.name}")
+        await ctx.send(embed=embed)
+
+    @command(name="ping", brief="Returns the bot latency.")
+    async def ping_command(self, ctx):
+        ping = int(self.client.latency * 1000)
+        embed = Embed(
+            title="Pong!", description=f"My ping is {ping}ms.", color=Color.green()
+        )
         await ctx.send(embed=embed)
 
 

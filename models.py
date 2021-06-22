@@ -1,7 +1,7 @@
 from tortoise.models import Model
 from tortoise import fields
 
-#Use this when adding new tables
+# Use this when adding new tables
 # aerich migrate
 # aerich upgrade
 
@@ -50,3 +50,15 @@ class TokenModel(Model):
     class Meta:
         table = "bot_token"
         table_description = "Stores the bot token."
+
+
+class ReputationPoints(Model):
+
+    id = fields.IntField(pk=True)
+    member_name = fields.TextField()
+    points = fields.IntField(default=0)
+    guild_id = fields.BigIntField()
+
+    class Meta:
+        table = "reputation_points"
+        table_description = "Stores Global Member Reputation"
