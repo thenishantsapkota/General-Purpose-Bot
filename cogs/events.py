@@ -18,7 +18,7 @@ class Events(Cog):
 
     @Cog.listener()
     async def on_message(self, msg):
-        if self.client.user.mentioned_in(msg):
+        if self.client.user.mentioned_in(msg) and "prefix" in msg.content:
             record = await PrefixModel.get_or_none(guild_id=msg.guild.id)
             prefix = ">" if not record.prefix else record.prefix
             embed = Embed(
@@ -47,8 +47,6 @@ class Events(Cog):
         await record.delete()
         welcome = await OnMemberJoinModel.get(guild_id=guild.id)
         await welcome.delete()
-
-
 
 
 def setup(client):

@@ -20,7 +20,7 @@ class Misc(Cog):
         embed.set_image(url=avatarUrl)
         await ctx.send(embed=embed)
 
-    @command(name="serverinfo",brief = "Returns some info about the guild.")
+    @command(name="serverinfo", brief="Returns some info about the guild.")
     async def serverinfo_command(self, ctx):
         owner = str(ctx.guild.owner.mention)
         id = str(ctx.guild.id)
@@ -52,7 +52,7 @@ class Misc(Cog):
             embed.add_field(name=name, value=value, inline=inline)
         await ctx.send(embed=embed)
 
-    @command(name="userinfo",brief="See the info of the user.")
+    @command(name="userinfo", brief="See the info of the user.")
     async def userinfo_command(self, ctx, member: Optional[Member]):
         member = member or ctx.author
         member_avatar = member.avatar_url
@@ -83,7 +83,7 @@ class Misc(Cog):
             embed.add_field(name=name, value=value, inline=inline)
         await ctx.send(embed=embed)
 
-    @command(name="catfact",brief="Returns a cat fact.")
+    @command(name="catfact", brief="Returns a cat fact.")
     async def catfact_command(self, ctx):
         async with aiohttp.ClientSession() as session:
             async with session.get("https://some-random-api.ml/facts/cat") as resp:
@@ -100,7 +100,7 @@ class Misc(Cog):
         embed.set_footer(text=f"Requested by {ctx.author.name}")
         await ctx.send(embed=embed)
 
-    @command(name="dogfact",brief="Returns a dog fact.")
+    @command(name="dogfact", brief="Returns a dog fact.")
     async def dogfact_command(self, ctx):
         async with aiohttp.ClientSession() as session:
             async with session.get("https://some-random-api.ml/facts/dog") as resp:
@@ -124,13 +124,11 @@ class Misc(Cog):
             title="Pong!", description=f"My ping is {ping}ms.", color=Color.green()
         )
         await ctx.send(embed=embed)
-    
-    @command(name="botinvite", brief = "Returns the invite link of bot")
-    async def botinvite_command(self,ctx):
+
+    @command(name="botinvite", brief="Returns the invite link of bot")
+    async def botinvite_command(self, ctx):
         invite = f"https://discord.com/oauth2/authorize?client_id={self.client.user.id}&permissions=0&scope=bot"
         await ctx.send(invite)
-    
-
 
 
 def setup(client):

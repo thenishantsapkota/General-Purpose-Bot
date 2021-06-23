@@ -27,7 +27,7 @@ class Reputation(Cog):
         )
         await ctx.send(embed=embed)
 
-    @command(name="replist", brief = "View the leaderboard of reputation for the server.")
+    @command(name="replist", brief="View the leaderboard of reputation for the server.")
     async def replist_command(self, ctx):
         rep_model = (
             await ReputationPoints.filter(guild_id=ctx.guild.id)
@@ -48,7 +48,8 @@ class Reputation(Cog):
         )
         embed.set_footer(text=f"Requested by {ctx.author.name}")
         embed.set_author(
-            name=f"{ctx.guild.name} Reputation Leaderboard", icon_url=ctx.guild.icon_url)
+            name=f"{ctx.guild.name} Reputation Leaderboard", icon_url=ctx.guild.icon_url
+        )
         await ctx.send(embed=embed)
 
 

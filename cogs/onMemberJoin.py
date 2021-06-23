@@ -21,7 +21,7 @@ class WelcomeMessage(Cog):
         )
         await ctx.send(embed=embed)
 
-    @command(name="setwelcomemessage", brief = "Set welcome message for the server.")
+    @command(name="setwelcomemessage", brief="Set welcome message for the server.")
     @commands.has_permissions(manage_guild=True)
     async def setwelcomemessage_command(self, ctx, *, welcomeMessage: Optional[str]):
         default = "Enjoy your stay here."
@@ -36,7 +36,7 @@ class WelcomeMessage(Cog):
         )
         await ctx.send(embed=embed)
 
-    @command(name="baserole", brief="Set a base role for the command.")
+    @command(name="baserole", brief="Set a base role for the server.")
     @commands.has_permissions(manage_guild=True)
     async def baserole_command(self, ctx, role: Role):
         if role in ctx.guild.roles:

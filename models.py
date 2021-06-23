@@ -57,7 +57,7 @@ class ReputationPoints(Model):
     id = fields.IntField(pk=True)
     member_name = fields.TextField()
     points = fields.IntField(default=0)
-    guild_id = fields.BigIntField()
+    guild_id = fields.BigIntField()  # before migrating comment this
 
     class Meta:
         table = "reputation_points"
@@ -69,7 +69,7 @@ class MuteModel(Model):
     member_id = fields.BigIntField()
     guild_id = fields.BigIntField()
     time = fields.IntField()
-    role_id = fields.TextField()
+    role_id = fields.TextField()  # before migrating comment this
 
     class Meta:
         table = "mutes"
@@ -78,10 +78,20 @@ class MuteModel(Model):
 
 class WarnModel(Model):
     id = fields.IntField(pk=True)
-    member_id =fields.BigIntField()
+    member_id = fields.BigIntField()
     guild_id = fields.BigIntField()
     reason = fields.TextField()
 
     class Meta:
         table = "warnings"
         table_description = "Stores Per Guild Warnings"
+
+
+class ModLogsModel(Model):
+    id = fields.IntField(pk=True)
+    guild_id = fields.BigIntField()
+    channel_id = fields.BigIntField()
+
+    class Meta:
+        table = "modlogs"
+        table_description = "Stores modlog channel info"
