@@ -11,7 +11,7 @@ from discord import (
 )
 from discord.ext import commands, tasks
 from discord.utils import get
-from discord.ext.commands import Cog, command, Greedy,CommandNotFound
+from discord.ext.commands import Cog, command, Greedy, CommandNotFound
 from discord.ext.menus import MenuPages, ListPageSource
 import jishaku
 

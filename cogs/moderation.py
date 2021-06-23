@@ -168,9 +168,7 @@ class Moderation(Cog):
     ):
         author = ctx.author
         guild = ctx.guild
-        logChannel = discord.utils.get(
-                    guild.text_channels, name="zorander-logs"
-        )
+        logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
         for member in members:
             if author.top_role > member.top_role:
                 if logChannel is None:
@@ -197,22 +195,26 @@ class Moderation(Cog):
                     "You cannot use moderation commands on users on same rank or higher that you.",
                     delete_after=10,
                 )
-    @command(name="ban",aliases=["hammer"], brief = "Bans the member from the server.",description = "Bans the member from the server.")
-    @commands.has_permissions(ban_members = True)
-    async def ban_command(self, ctx, members:Greedy[User],*,reason):
+
+    @command(
+        name="ban",
+        aliases=["hammer"],
+        brief="Bans the member from the server.",
+        description="Bans the member from the server.",
+    )
+    @commands.has_permissions(ban_members=True)
+    async def ban_command(self, ctx, members: Greedy[User], *, reason):
         author = ctx.author
         guild = ctx.guild
-        logChannel = discord.utils.get(
-                    guild.text_channels, name="zorander-logs"
-                )
+        logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
         for member in members:
-            #if author.top_role > member.top_role:
+            # if author.top_role > member.top_role:
             if logChannel is None:
                 logChannel = await guild.create_text_channel("zorander-logs")
                 await logChannel.set_permissions(
                     guild.default_role, view_channel=False, send_messages=False
                 )
-            await guild.ban(member, reason = reason)
+            await guild.ban(member, reason=reason)
             embed = Embed(
                 color=Color.red(),
                 timestamp=datetime.utcnow(),
@@ -232,21 +234,20 @@ class Moderation(Cog):
         #             delete_after=10,
         #         )
 
-
-    @command(name="unban",brief = "Unban the user from the server.")
-    @commands.has_permissions(manage_guild = True)
-    async def unban_command(self, ctx, user:User, *, reason:Optional[str]="No reason specified."):
+    @command(name="unban", brief="Unban the user from the server.")
+    @commands.has_permissions(manage_guild=True)
+    async def unban_command(
+        self, ctx, user: User, *, reason: Optional[str] = "No reason specified."
+    ):
         author = ctx.author
         guild = ctx.guild
-        logChannel = discord.utils.get(
-                    guild.text_channels, name="zorander-logs"
-                )
+        logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
         if logChannel is None:
             logChannel = await guild.create_text_channel("zorander-logs")
             await logChannel.set_permissions(
                 guild.default_role, view_channel=False, send_messages=False
             )
-        await guild.unban(user,reason=reason)
+        await guild.unban(user, reason=reason)
         embed = Embed(
             color=Color.green(),
             timestamp=datetime.utcnow(),
@@ -259,12 +260,107 @@ class Moderation(Cog):
         embed.add_field(name="Reason", value=reason)
         embed.set_thumbnail(url=user.avatar_url)
         await logChannel.send(embed=embed)
-        await ctx.send(f':unlock: Unbanned `{user.name}`')
+        await ctx.send(f":unlock: Unbanned `{user.name}`")
 
+    @command(name="warn", brief="Warns the user.")
+    @commands.has_permissions(manage_messages=True)
+    async def warn_command(self, ctx, members: Greedy[Member], *, reason):
+        author = ctx.author
+        guild = ctx.guild
 
+        for member in members:
+            logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
+            if author.top_role > member.top_role:
+                if logChannel is None:
+                    logChannel = await guild.create_text_channel("zorander-logs")
+                    await logChannel.set_permissions(
+                        guild.default_role, view_channel=False, send_messages=False
+                    )
+                model = await WarnModel.create(
+                    guild_id=guild.id, member_id=member.id, reason=reason
+                )
+                await model.save()
+                warn_model = await WarnModel.filter(guild_id=guild.id, member_id=member.id)
 
+                if len(warn_model) > 7:
+                    await member.kick(reason="Too Many Warnings")
+                    embed = Embed(
+                    color=Color.red(),
+                    timestamp=datetime.utcnow(),
+                    description=f"**:boot: Kicked {member.name} # {member.discriminator} [ID {member.id}]**",
+                    )
+                    embed.set_author(
+                        name=f"{self.client.user.name} # {self.client.user.discriminator} [ID {self.client.user.id}]",
+                        icon_url=self.client.user.avatar_url,
+                    )
+                    embed.add_field(name="Reason", value="Too Many Warnings")
+                    embed.set_thumbnail(url=member.avatar_url)
+                    await logChannel.send(embed=embed)
+                    await ctx.send(f":boot: Kicked `{member.name}.`")
 
+                
+                embed = Embed(
+                    color=Color.red(),
+                    timestamp=datetime.utcnow(),
+                    description=f"**:warning: Warned {member.name} # {member.discriminator} [ID {member.id}]**",
+                )
+                embed.set_author(
+                    name=f"{author.name} # {author.discriminator} [ID {author.id}]",
+                    icon_url=author.avatar_url,
+                )
+                embed.add_field(name="Reason", value=reason)
+                embed.set_thumbnail(url=member.avatar_url)
+                await logChannel.send(embed=embed)
+                await ctx.send(f":warning: Warned `{member.name}`")
+            else:
+                await ctx.send(
+                    "You cannot use moderation commands on users on same rank or higher that you.",
+                    delete_after=10,
+                )
 
+    @command(name="warnings", brief="View warnings of the user.")
+    @commands.has_permissions(manage_messages=True)
+    async def warnings_command(self, ctx, member: Optional[Member]):
+        author = ctx.author
+        guild = ctx.guild
+        member = member or author
+        warn_model = await WarnModel.filter(guild_id=guild.id, member_id=member.id)
+
+        warnings = "\n".join(
+            [
+                f" ```{i+1}. {model.reason}   [Warning ID - {model.id}]```"
+                for (i, model) in enumerate(warn_model)
+            ]
+        )
+        embed = Embed(
+            color=Color.blurple(),
+            timestamp=datetime.utcnow(),
+            description=warnings if len(warn_model) else "User hasn't been warned.",
+        )
+        embed.set_footer(text=f"Requested by {author.name}")
+        embed.set_author(name=f"Warnings of {member.name}", icon_url=member.avatar_url)
+        await ctx.send(embed=embed)
+
+    @command(name="delwarning", brief="Delete a warning of a user.")
+    @commands.has_permissions(kick_members=True)
+    async def delwarning_command(self, ctx, id: int):
+        guild = ctx.guild
+        model = await WarnModel.get_or_none(guild_id=guild.id, id=id)
+        await model.delete()
+        await ctx.send("Done :ok_hand:")
+
+    @command(name="clw")
+    @commands.has_permissions(administrator=True)
+    async def clw_command(self, ctx, member: Member):
+        author = ctx.author
+        guild = ctx.guild
+        model = await WarnModel.filter(guild_id=guild.id, member_id=member.id).delete()
+        embed = Embed(color=Color.green())
+        embed.set_author(
+            name=f"Warnings of {member.name} cleared successfully by {author.name}.",
+            icon_url=member.avatar_url,
+        )
+        await ctx.send(embed=embed)
 
 
 def setup(client):
