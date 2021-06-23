@@ -9,7 +9,7 @@ class Prefixes(Cog):
     @command(
         name="changeprefix",
         aliases=["chp"],
-        description="Changes the prefix of the bot in the server.",
+        brief="Changes the prefix of the bot in the server.",
     )
     @commands.has_permissions(administrator=True)
     async def changeprefix_command(self, ctx, prefix: str):

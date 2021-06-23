@@ -6,8 +6,8 @@ class Reputation(Cog):
     def __init__(self, client):
         self.client = client
 
-    # @commands.cooldown(1, 86400, commands.buckettype.user)
-    @command(name="rep")
+    @commands.cooldown(1, 86400, commands.BucketType.user)
+    @command(name="rep", brief="Give a reputation point to the user")
     async def reputation_command(self, ctx, member: Member):
         await self.reputation_handler(ctx, member)
 
@@ -27,7 +27,7 @@ class Reputation(Cog):
         )
         await ctx.send(embed=embed)
 
-    @command(name="replist")
+    @command(name="replist", brief = "View the leaderboard of reputation for the server.")
     async def replist_command(self, ctx):
         rep_model = (
             await ReputationPoints.filter(guild_id=ctx.guild.id)

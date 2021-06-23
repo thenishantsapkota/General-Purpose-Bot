@@ -62,3 +62,26 @@ class ReputationPoints(Model):
     class Meta:
         table = "reputation_points"
         table_description = "Stores Global Member Reputation"
+
+
+class MuteModel(Model):
+    id = fields.IntField(pk=True)
+    member_id = fields.BigIntField()
+    guild_id = fields.BigIntField()
+    time = fields.IntField()
+    role_id = fields.TextField()
+
+    class Meta:
+        table = "mutes"
+        table_description = "Stores Per Guild Mute Data"
+
+
+class WarnModel(Model):
+    id = fields.IntField(pk=True)
+    member_id =fields.BigIntField()
+    guild_id = fields.BigIntField()
+    reason = fields.TextField()
+
+    class Meta:
+        table = "warnings"
+        table_description = "Stores Per Guild Warnings"

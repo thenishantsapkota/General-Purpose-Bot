@@ -14,7 +14,7 @@ class Compiler(Cog):
             ) as resp:
                 return await resp.json()
 
-    @command(name="compile")
+    @command(name="compile",brief="Returns output of the code provided.")
     async def compile_command(self, ctx, *, codeblock: str):
         regex = re.compile(r"(\w*)\s*(?:```)(\w*)?([\s\S]*)(?:```$)")
         matches = regex.findall(codeblock)

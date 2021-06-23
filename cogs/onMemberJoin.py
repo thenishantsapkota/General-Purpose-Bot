@@ -6,9 +6,9 @@ class WelcomeMessage(Cog):
     def __init__(self, client):
         self.client = client
 
-    @command()
+    @command(name="setwelcome", brief="Set a welcome channel for the server.")
     @commands.has_permissions(manage_guild=True)
-    async def setwelcome(self, ctx, channel: Optional[TextChannel]):
+    async def setwelcome_command(self, ctx, channel: Optional[TextChannel]):
         channel = channel or ctx.channel
         model = await OnMemberJoinModel.get_or_none(guild_id=ctx.guild.id)
         model.channel_id = channel.id
@@ -21,9 +21,9 @@ class WelcomeMessage(Cog):
         )
         await ctx.send(embed=embed)
 
-    @command()
+    @command(name="setwelcomemessage", brief = "Set welcome message for the server.")
     @commands.has_permissions(manage_guild=True)
-    async def setwelcomemessage(self, ctx, *, welcomeMessage: Optional[str]):
+    async def setwelcomemessage_command(self, ctx, *, welcomeMessage: Optional[str]):
         default = "Enjoy your stay here."
         welcome = await OnMemberJoinModel.get_or_none(guild_id=ctx.guild.id)
         welcome.welcome_message = welcomeMessage
@@ -36,9 +36,9 @@ class WelcomeMessage(Cog):
         )
         await ctx.send(embed=embed)
 
-    @command()
+    @command(name="baserole", brief="Set a base role for the command.")
     @commands.has_permissions(manage_guild=True)
-    async def baserole(self, ctx, role: Role):
+    async def baserole_command(self, ctx, role: Role):
         if role in ctx.guild.roles:
             model = await OnMemberJoinModel.get_or_none(guild_id=ctx.guild.id)
             model.base_role_id = role.id
