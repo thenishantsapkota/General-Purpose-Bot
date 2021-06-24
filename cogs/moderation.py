@@ -1,5 +1,7 @@
+from re import A
+from typing import Text
 from modules.imports import *
-from models import MuteModel, WarnModel, ModLogsModel
+from models import MuteModel, WarnModel, ModerationRoles
 
 
 time_regex = re.compile("(?:(\d{1,5})(h|s|m|d))+?")
@@ -228,6 +230,7 @@ class Moderation(Cog):
             embed.set_thumbnail(url=member.avatar_url)
             await logChannel.send(embed=embed)
             await ctx.send(f":hammer: Banned `{member.name}.`")
+
         # else:
         #     await ctx.send(
         #             "You cannot use moderation commands on users on same rank or higher that you.",
@@ -280,14 +283,16 @@ class Moderation(Cog):
                     guild_id=guild.id, member_id=member.id, reason=reason
                 )
                 await model.save()
-                warn_model = await WarnModel.filter(guild_id=guild.id, member_id=member.id)
+                warn_model = await WarnModel.filter(
+                    guild_id=guild.id, member_id=member.id
+                )
 
                 if len(warn_model) > 7:
                     await member.kick(reason="Too Many Warnings")
                     embed = Embed(
-                    color=Color.red(),
-                    timestamp=datetime.utcnow(),
-                    description=f"**:boot: Kicked {member.name} # {member.discriminator} [ID {member.id}]**",
+                        color=Color.red(),
+                        timestamp=datetime.utcnow(),
+                        description=f"**:boot: Kicked {member.name} # {member.discriminator} [ID {member.id}]**",
                     )
                     embed.set_author(
                         name=f"{self.client.user.name} # {self.client.user.discriminator} [ID {self.client.user.id}]",
@@ -298,7 +303,6 @@ class Moderation(Cog):
                     await logChannel.send(embed=embed)
                     await ctx.send(f":boot: Kicked `{member.name}.`")
 
-                
                 embed = Embed(
                     color=Color.red(),
                     timestamp=datetime.utcnow(),
@@ -314,7 +318,7 @@ class Moderation(Cog):
                 await ctx.send(f":warning: Warned `{member.name}`")
             else:
                 await ctx.send(
-                    "You cannot use moderation commands on users on same rank or higher that you.",
+                    "You cannot use moderation commands on users on same rank or higher than you.",
                     delete_after=10,
                 )
 
@@ -349,7 +353,7 @@ class Moderation(Cog):
         await model.delete()
         await ctx.send("Done :ok_hand:")
 
-    @command(name="clw")
+    @command(name="clw", brief="Clear the warnings of the member.")
     @commands.has_permissions(administrator=True)
     async def clw_command(self, ctx, member: Member):
         author = ctx.author
@@ -359,6 +363,219 @@ class Moderation(Cog):
         embed.set_author(
             name=f"Warnings of {member.name} cleared successfully by {author.name}.",
             icon_url=member.avatar_url,
+        )
+        await ctx.send(embed=embed)
+
+    @command(name="adminroleset", brief="Set administrator role for the server.")
+    @commands.has_permissions(administrator=True)
+    async def adminroleset_command(self, ctx, role: Role):
+        guild = ctx.guild
+        if role in ctx.guild.roles:
+            model, _ = await ModerationRoles.get_or_create(guild_id=guild.id)
+            model.admin_role = role.id
+            await model.save()
+            embed = Embed(
+                title="Admin Role",
+                description=f"The admin role  for {ctx.guild.name} has been set to {role.mention}",
+                timestamp=datetime.utcnow(),
+                color=Color.blurple(),
+            )
+            await ctx.send(embed=embed)
+
+    @command(name="modroleset", brief="Set moderator role for the server.")
+    @commands.has_permissions(administrator=True)
+    async def modroleset_command(self, ctx, role: Role):
+        guild = ctx.guild
+        if role in ctx.guild.roles:
+            model, _ = await ModerationRoles.get_or_create(guild_id=guild.id)
+            model.mod_role = role.id
+            await model.save()
+            embed = Embed(
+                title="Moderator Role",
+                description=f"The mod role  for {ctx.guild.name} has been set to {role.mention}",
+                timestamp=datetime.utcnow(),
+                color=Color.blurple(),
+            )
+            await ctx.send(embed=embed)
+
+    @command(name="staffroleset", brief="Set staff role for the server.")
+    @commands.has_permissions(administrator=True)
+    async def staffroleset_command(self, ctx, role: Role):
+        guild = ctx.guild
+        if role in ctx.guild.roles:
+            model, _ = await ModerationRoles.get_or_create(guild_id=guild.id)
+            model.staff_role = role.id
+            await model.save()
+            embed = Embed(
+                title="Staff Role",
+                description=f"The staff role  for {ctx.guild.name} has been set to {role.mention}",
+                timestamp=datetime.utcnow(),
+                color=Color.blurple(),
+            )
+            await ctx.send(embed=embed)
+
+    @command(name="lockchannel", brief="Lock the channel provided")
+    @commands.has_permissions(manage_channels=True)
+    async def lockchannel_command(self, ctx, channel: Optional[TextChannel]):
+        guild = ctx.guild
+        channel = channel or ctx.channel
+        model = await ModerationRoles.get_or_none(guild_id=guild.id)
+        staff_role = discord.utils.get(
+            guild.roles, id=(0 if model is None else model.staff_role)
+        )
+        if staff_role is None:
+            await ctx.send(
+                f"Please set a staff role using `staffroleset <roleid>` before using lockchannel command."
+            )
+            return
+        overwrite_staff = channel.overwrites_for(staff_role)
+        overwrite_default = channel.overwrites_for(guild.default_role)
+        overwrite_default.send_messages = False
+        overwrite_staff.send_messages = True
+        await channel.set_permissions(guild.default_role, overwrite=overwrite_default)
+        await channel.set_permissions(staff_role, overwrite=overwrite_staff)
+        embed = Embed(
+            title="Lock Channel",
+            description="🔒 Channel has been locked!",
+            color=Color.red(),
+        )
+        await ctx.send(embed=embed)
+
+    @command(name="unlockchannel", brief="Unlock the channel provided.")
+    @commands.has_permissions(manage_channels=True)
+    async def unlockchannel_command(self, ctx, channel: Optional[TextChannel]):
+        guild = ctx.guild
+        channel = channel or ctx.channel
+        model = await ModerationRoles.get_or_none(guild_id=guild.id)
+        staff_role = discord.utils.get(
+            guild.roles, id=(0 if model is None else model.staff_role)
+        )
+        if staff_role is None:
+            await ctx.send(
+                f"Please set a staff role using `staffroleset <roleid>` before using unlockchannel command."
+            )
+            return
+        overwrite_staff = channel.overwrites_for(staff_role)
+        overwrite_default = channel.overwrites_for(guild.default_role)
+        overwrite_default.send_messages = None
+        overwrite_staff.send_messages = None
+        await channel.set_permissions(guild.default_role, overwrite=overwrite_default)
+        await channel.set_permissions(staff_role, overwrite=overwrite_staff)
+        embed = Embed(
+            title="Unlock Channel",
+            description="🔓 Channel has been unlocked!",
+            color=Color.green(),
+        )
+        await ctx.send(embed=embed)
+
+    @commands.group(
+        name="lockdown", invoke_without_subcommand=True, brief="Lockdown the server."
+    )
+    @commands.has_permissions(manage_channels=True)
+    async def lockdown_command(self, ctx):
+        await ctx.send("Please use `start` or `end` as arguments.", delete_after=10)
+
+    @lockdown_command.command(name="start")
+    async def startlockdown(self, ctx):
+        guild = ctx.guild
+        perms_default, perms_staff, staff_role = await self.get_permissions(ctx)
+
+        perms_default.send_messages = False
+        perms_default.connect = False
+        perms_staff.send_messages = True
+        await guild.default_role.edit(permissions=perms_default)
+        await staff_role.edit(permissions=perms_staff)
+        embed = discord.Embed(
+            title="Lockdown",
+            description=f"🔒 Server has been locked down!",
+            color=Color.red(),
+        )
+        await ctx.send(embed=embed)
+
+    @lockdown_command.command(name="end")
+    async def endlockdown(self, ctx):
+        guild = ctx.guild
+        perms_default, perms_staff, staff_role = await self.get_permissions(ctx)
+
+        perms_default.send_messages = True
+        perms_default.connect = True
+        perms_staff.send_messages = True
+        await guild.default_role.edit(permissions=perms_default)
+        await staff_role.edit(permissions=perms_staff)
+        embed = discord.Embed(
+            title="Lockdown",
+            description=f"🔓 Server has been unlocked!",
+            color=Color.green(),
+        )
+        await ctx.send(embed=embed)
+
+    async def get_permissions(self, ctx):
+        guild = ctx.guild
+        model = await ModerationRoles.get_or_none(guild_id=guild.id)
+        staff_role = discord.utils.get(
+            guild.roles, id=(0 if model is None else model.staff_role)
+        )
+        if staff_role is None:
+            await ctx.send(
+                f"Please set a staff role using `staffroleset <roleid>` before using lockdown command."
+            )
+            return
+        perms_default = guild.default_role.permissions
+        perms_staff = staff_role.permissions
+        return (perms_default, perms_staff, staff_role)
+
+    @command(name="giverole", aliases=["addrole"], brief="Add a role to the user.")
+    @commands.has_permissions(administrator=True)
+    async def giverole_command(self, ctx, member: Optional[Member], *, role: Role):
+        author = ctx.author
+        guild = ctx.guild
+        member = member or ctx.author
+        if role in guild.roles:
+            await member.add_roles(role, reason=f"Invoked by {author}")
+            embed = Embed(
+                color=role.color,
+                timestamp=datetime.utcnow(),
+                description=f"**Role Added** \n {role.name}",
+            )
+            embed.set_author(
+                name=f"Updated roles for {member}", icon_url=member.avatar_url
+            )
+            embed.set_footer(text=f"Command Invoked by {author}")
+            await ctx.send(embed=embed)
+
+    @command(
+        name="takerole", aliases=["removerole"], brief="Remove a role from the user."
+    )
+    @commands.has_permissions(administrator=True)
+    async def takerole_command(self, ctx, member: Optional[Member], *, role: Role):
+        author = ctx.author
+        guild = ctx.guild
+        member = member or ctx.author
+        if role in guild.roles:
+            await member.remove_roles(role, reason=f"Invoked by {author}")
+            embed = Embed(
+                color=role.color,
+                timestamp=datetime.utcnow(),
+                description=f"**Role Removed** \n {role.name}",
+            )
+            embed.set_author(
+                name=f"Updated roles for {member}", icon_url=member.avatar_url
+            )
+            embed.set_footer(text=f"Command Invoked by {author}")
+            await ctx.send(embed=embed)
+
+    @command(name="slowmode", brief="Add slowmode to the channel you invoke it in.")
+    @commands.has_permissions(manage_channels=True)
+    async def slowmode_command(self, ctx, channel: Optional[TextChannel], seconds: int):
+        author = ctx.author
+        channel = channel or ctx.channel
+        await channel.edit(slowmode_delay=seconds)
+        description = f"Set the slowmode delay in this channel to {seconds} seconds."
+        embed = Embed(color=Color.blurple(), timestamp=datetime.utcnow())
+        embed.set_footer(text=f"Command Invoked by {author}")
+        embed.set_author(
+            name=description if seconds != 0 else "Slowmode disabled in this channel.",
+            icon_url=author.avatar_url,
         )
         await ctx.send(embed=embed)
 

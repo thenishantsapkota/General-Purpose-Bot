@@ -87,11 +87,13 @@ class WarnModel(Model):
         table_description = "Stores Per Guild Warnings"
 
 
-class ModLogsModel(Model):
+class ModerationRoles(Model):
     id = fields.IntField(pk=True)
+    admin_role = fields.BigIntField()
+    mod_role = fields.BigIntField()
+    staff_role = fields.BigIntField()
     guild_id = fields.BigIntField()
-    channel_id = fields.BigIntField()
 
     class Meta:
-        table = "modlogs"
-        table_description = "Stores modlog channel info"
+        table = "staffroles"
+        table_description = "Stores StaffRoles of the server"
