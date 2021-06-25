@@ -43,14 +43,6 @@ class OnMemberJoinModel(Model):
         table_description = "Stores the Welcome channel and Welcome Message of the bot."
 
 
-class TokenModel(Model):
-
-    bot_token = fields.TextField(pk=True)
-
-    class Meta:
-        table = "bot_token"
-        table_description = "Stores the bot token."
-
 
 class ReputationPoints(Model):
 
@@ -61,14 +53,14 @@ class ReputationPoints(Model):
 
     class Meta:
         table = "reputation_points"
-        table_description = "Stores Global Member Reputation"
+        table_description = "Stores Global Member Reputation."
 
 
 class MuteModel(Model):
     id = fields.IntField(pk=True)
     member_id = fields.BigIntField()
     guild_id = fields.BigIntField()
-    time = fields.IntField()
+    time = fields.DatetimeField() # before migrating comment this
     role_id = fields.TextField()  # before migrating comment this
 
     class Meta:

@@ -2,7 +2,8 @@ from re import A
 from typing import Text
 from modules.imports import *
 from models import MuteModel, WarnModel, ModerationRoles
-
+from datetime import date, timedelta
+import pytz
 
 class NotEnoughPermissions(commands.CommandError):
     pass
@@ -73,12 +74,12 @@ class Moderation(Cog):
                                 send_messages=False,
                                 read_message_history=True,
                             )
-
+                    end_time = datetime.now() + timedelta(seconds=time)
                     role_ids = ",".join([str(r.id) for r in member.roles])
                     model, _ = await MuteModel.get_or_create(
                         guild_id=guild.id,
                         member_id=member.id,
-                        time=time,
+                        time=end_time,
                         role_id=role_ids,
                     )
                     await model.save()
@@ -113,6 +114,58 @@ class Moderation(Cog):
         if len(unmutes):
             await asyncio.sleep(time)
             await self.unmute_handler(ctx, members)
+
+    @Cog.listener()
+    async def on_ready(self):
+        await asyncio.sleep(5)
+        models =  MuteModel.all()
+        async for model in models:
+            asyncio.create_task(self.mute_handler(model))
+
+        
+    
+    async def mute_handler(self, model:MuteModel):
+        utc = pytz.UTC
+        localized_mutetime = (model.time)
+        localized_nowtime = utc.localize(datetime.now())
+        if localized_mutetime > localized_nowtime:
+            remaining_time = (localized_mutetime - localized_nowtime).total_seconds()
+            await asyncio.sleep(remaining_time)
+            await self.mute_handler_get(model)
+            print("Success")
+            return
+        await self.mute_handler_get(model)
+        print("Sucess - A")
+
+            
+        
+    async def mute_handler_get(self, model:MuteModel):
+        guild = self.client.get_guild(model.guild_id)
+        member = guild.get_member(model.member_id)
+        logChannel = discord.utils.get(
+                        guild.text_channels, name="zorander-logs"
+        )
+        role_ids = model.role_id
+        roles = [
+            guild.get_role(int(id_)) for id_ in role_ids.split(",") if len(id_)
+        ]
+        await member.edit(roles = roles)
+        await model.delete()
+        embed = Embed(
+            description=f"**:loud_sound: Unmuted {member.name} # {member.discriminator} [ID {member.id}]**",
+            color=Color.green(),
+            timestamp=datetime.utcnow(),
+        )
+        embed.set_author(
+            name=f"{self.client.user.name} # {self.client.user.discriminator} [ID {self.client.user.id}]",
+            icon_url=self.client.user.avatar_url,
+        )
+        embed.add_field(name="Reason", value="Mute Duration Expired.")
+        embed.set_thumbnail(url=member.avatar_url)
+        await logChannel.send(embed=embed)
+
+
+
     
     # @command(name="test")
     # async def test(self,ctx, member:Member):
@@ -437,13 +490,10 @@ class Moderation(Cog):
         await ctx.send(embed=embed)
 
     @command(name="adminroleset", brief="Set administrator role for the server.")
-    #@commands.has_permissions(administrator=True)
+    @commands.has_permissions(administrator=True)
     async def adminroleset_command(self, ctx, role: Role):
         guild = ctx.guild
         author = ctx.author
-        adminrole = (await self.fetchRoleData(guild)).get("adminrole")
-        if not (await self.has_permissions(author, "administrator") or await self.rolecheck(author, adminrole)):
-            raise NotEnoughPermissions("You don't have either the roles required or the permissions.")
 
         if role in ctx.guild.roles:
             model, _ = await ModerationRoles.get_or_create(guild_id=guild.id)
@@ -458,13 +508,10 @@ class Moderation(Cog):
             await ctx.send(embed=embed)
 
     @command(name="modroleset", brief="Set moderator role for the server.")
-    #@commands.has_permissions(administrator=True)
+    @commands.has_permissions(administrator=True)
     async def modroleset_command(self, ctx, role: Role):
         guild = ctx.guild
         author = ctx.author
-        adminrole = (await self.fetchRoleData(guild)).get("adminrole")
-        if not (await self.has_permissions(author, "administrator") or await self.rolecheck(author, adminrole)):
-            raise NotEnoughPermissions("You don't have either the roles required or the permissions.")
 
         if role in ctx.guild.roles:
             model, _ = await ModerationRoles.get_or_create(guild_id=guild.id)
@@ -479,16 +526,13 @@ class Moderation(Cog):
             await ctx.send(embed=embed)
 
     @command(name="staffroleset", brief="Set staff role for the server.")
-    #@commands.has_permissions(administrator=True)
+    @commands.has_permissions(administrator=True)
     async def staffroleset_command(self, ctx, role: Role):
         guild = ctx.guild
         author = ctx.author
-        adminrole = (await self.fetchRoleData(guild)).get("adminrole")
-        if not (await self.has_permissions(author, "administrator") or await self.rolecheck(author, adminrole)):
-            raise NotEnoughPermissions("You don't have either the roles required or the permissions.")
 
         if role in ctx.guild.roles:
-            model, _ = await ModerationRoles.get_or_create(guild_id=guild.id)
+            model , _ = await ModerationRoles.get_or_create(guild_id=guild.id)
             model.staff_role = role.id
             await model.save()
             embed = Embed(
