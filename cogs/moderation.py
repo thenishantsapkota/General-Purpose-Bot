@@ -74,8 +74,11 @@ class Moderation(Cog):
                         role_id=role_ids,
                     )
                     await model.save()
-
-                    await member.edit(roles=[muted_role], reason="Muted the User")
+                    if ctx.guild.premium_subscriber_role in member.roles:
+                        await member.edit(roles=[muted_role, ctx.guild.premium_subscriber_role], reason="Muted the User")
+                    elif ctx.guild.premium_subscriber_role not in member.roles:
+                        await member.edit(roles=[muted_role], reason="Muted the user.")
+                    
                     embed = Embed(
                         description=f"**:mute: Muted {member.name} # {member.discriminator} [ID {member.id}]**",
                         color=Color.red(),
@@ -102,6 +105,13 @@ class Moderation(Cog):
         if len(unmutes):
             await asyncio.sleep(time)
             await self.unmute_handler(ctx, members)
+    
+    # @command(name="test")
+    # async def test(self,ctx, member:Member):
+    #     if ctx.guild.premium_subscriber_role in member.roles:
+    #         await ctx.send("Has the role")
+    #         return
+    #     await ctx.send("Doesn't have the role.")
 
     @command(
         name="unmute", aliases=["unsilence"], brief="Unmute a member from the server."
