@@ -1,5 +1,6 @@
 from modules.imports import *
 import aiohttp
+import random
 
 class Fun(Cog):
 
@@ -39,6 +40,18 @@ class Fun(Cog):
         )
         embed.set_footer(text=f"Requested by {ctx.author.name}")
         await ctx.send(embed=embed)
+    
+    @command(name="iqcheck")
+    async def iqcheck_command(self,ctx, member:Optional[Member]):
+        member = member or ctx.author
+        integer = random.randint(1,200)
+        await ctx.send(f"**{member}'s IQ is {integer}.**")
+    
+
+    @command(name="wink")
+    async def wink_command(self, ctx, member:Member):
+        pass
+
 
 
 
