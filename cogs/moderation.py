@@ -132,10 +132,10 @@ class Moderation(Cog):
             remaining_time = (localized_mutetime - localized_nowtime).total_seconds()
             await asyncio.sleep(remaining_time)
             await self.mute_handler_get(model)
-            print("Success")
+            #print("Success")
             return
         await self.mute_handler_get(model)
-        print("Sucess - A")
+        #print("Sucess - A")
 
             
         

@@ -1,5 +1,5 @@
 from modules.imports import *
-from models import OnMemberJoinModel
+from models import MuteModel, OnMemberJoinModel
 
 
 class WelcomeMessage(Cog):
@@ -56,6 +56,10 @@ class WelcomeMessage(Cog):
     @Cog.listener()
     async def on_member_join(self, member):
         default = "Enjoy your stay here."
+        mutedRole = discord.utils.get(member.guild.roles, name="Muted")
+        muteQuery = await MuteModel.get_or_none(guild_id = member.guild.id)
+        if muteQuery.member_id == member.id:
+            await member.edit(roles=[mutedRole])
         query = await OnMemberJoinModel.get_or_none(guild_id=member.guild.id)
         message = query.welcome_message
         guild = self.client.get_guild(query.guild_id)
