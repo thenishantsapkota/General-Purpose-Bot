@@ -1,5 +1,5 @@
-from tortoise.models import Model
 from tortoise import fields
+from tortoise.models import Model
 
 # Use this when adding new tables
 # aerich migrate
@@ -43,7 +43,6 @@ class OnMemberJoinModel(Model):
         table_description = "Stores the Welcome channel and Welcome Message of the bot."
 
 
-
 class ReputationPoints(Model):
 
     id = fields.IntField(pk=True)
@@ -60,7 +59,7 @@ class MuteModel(Model):
     id = fields.IntField(pk=True)
     member_id = fields.BigIntField()
     guild_id = fields.BigIntField()
-    time = fields.DatetimeField() # before migrating comment this
+    time = fields.DatetimeField()  # before migrating comment this
     role_id = fields.TextField()  # before migrating comment this
 
     class Meta:

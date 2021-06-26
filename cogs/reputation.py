@@ -1,5 +1,5 @@
-from modules.imports import *
 from models import ReputationPoints
+from modules.imports import *
 
 
 class Reputation(Cog):

@@ -1,5 +1,6 @@
-from modules.imports import *
 import aiohttp
+
+from modules.imports import *
 
 
 class Compiler(Cog):

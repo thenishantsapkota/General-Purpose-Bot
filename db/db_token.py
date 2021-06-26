@@ -1,6 +1,5 @@
 from modules.imports import *
 
-
 engine = create_engine("sqlite:///db/database.db")
 Session = sessionmaker(bind=engine)
 session = Session()

@@ -1,5 +1,5 @@
+from models import OnMemberJoinModel, PrefixModel
 from modules.imports import *
-from models import PrefixModel, OnMemberJoinModel
 
 
 class Events(Cog):

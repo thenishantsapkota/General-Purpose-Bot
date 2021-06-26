@@ -1,6 +1,8 @@
 from datetime import date
-from modules.imports import *
+
 import aiohttp
+
+from modules.imports import *
 
 
 class Misc(Cog):
@@ -82,7 +84,6 @@ class Misc(Cog):
         for name, value, inline in fields:
             embed.add_field(name=name, value=value, inline=inline)
         await ctx.send(embed=embed)
-
 
     @command(name="ping", brief="Returns the bot latency.")
     async def ping_command(self, ctx):

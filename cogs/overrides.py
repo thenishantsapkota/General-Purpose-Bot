@@ -1,6 +1,7 @@
 from typing import Text
-from modules.imports import *
+
 from models import OverrideModel
+from modules.imports import *
 
 
 class CmdOverrides(Cog):
@@ -33,23 +34,20 @@ class CmdOverrides(Cog):
                 model.enable = toggle
                 await model.save()
             toggle_string = "enabled" if toggle else "disabled"
-            channel_mention = "".join(
-                [channel.mention for channel in channels])
+            channel_mention = "".join([channel.mention for channel in channels])
             await ctx.send(f"`{command.name}` {toggle_string} in {channel_mention}")
-        
-    @toggle.group(name="enable")
-    async def toggle_enable(self, ctx, command:str, channels:Greedy[TextChannel]):
-        await self.toggle_handler(ctx, command, channels, True)
-    
-    @toggle.group(name="disable")
-    async def toggle_disable(self, ctx, command:str, channels:Greedy[TextChannel]):
-        await self.toggle_handler(ctx, command, channels, False)
-    
-    @toggle.command(name="all")
-    async def toggleall(self, ctx, command:str, toggle:bool):
-        await self.toggle_handler(ctx, command, ctx.guild.text_channels, toggle)
-    
 
+    @toggle.group(name="enable")
+    async def toggle_enable(self, ctx, command: str, channels: Greedy[TextChannel]):
+        await self.toggle_handler(ctx, command, channels, True)
+
+    @toggle.group(name="disable")
+    async def toggle_disable(self, ctx, command: str, channels: Greedy[TextChannel]):
+        await self.toggle_handler(ctx, command, channels, False)
+
+    @toggle.command(name="all")
+    async def toggleall(self, ctx, command: str, toggle: bool):
+        await self.toggle_handler(ctx, command, ctx.guild.text_channels, toggle)
 
     @command()
     async def check(self, ctx, command: str, channel: Optional[TextChannel]):
