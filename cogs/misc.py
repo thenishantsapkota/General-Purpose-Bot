@@ -3,8 +3,17 @@ from datetime import date
 import aiohttp
 
 from facebook_scraper import get_posts
+from dotenv import load_dotenv
+from pathlib import Path
 
 from modules.imports import *
+
+load_dotenv()
+env_path = Path(".") / ".env"
+load_dotenv(dotenv_path=env_path)
+
+FB_PASS = os.getenv("FB_PASSWORD")
+FB_EMAIL = os.getenv("FB_EMAIL")
 
 
 class Misc(Cog):
@@ -33,7 +42,8 @@ class Misc(Cog):
         textChannels = len(ctx.guild.text_channels)
         voiceChannels = len(ctx.guild.voice_channels)
         roles = len(ctx.guild.roles)
-        guildCreatedate = ctx.guild.created_at.strftime("%a, %#d %B %Y, %I:%M %p")
+        guildCreatedate = ctx.guild.created_at.strftime(
+            "%a, %#d %B %Y, %I:%M %p")
 
         embed = Embed(
             title=f"Info of {ctx.guild.name} Server",
@@ -63,7 +73,8 @@ class Misc(Cog):
         id = member.id
         name = member.name
         accountAge = member.created_at.strftime("%a, %#d %B %Y, %I:%M %p UTC")
-        joinServerDate = member.joined_at.strftime("%a, %#d %B %Y, %I:%M %p UTC")
+        joinServerDate = member.joined_at.strftime(
+            "%a, %#d %B %Y, %I:%M %p UTC")
         highestRole = member.top_role.mention
 
         info = "Server Owner" if ctx.guild.owner is ctx.author else "Member"
@@ -99,25 +110,24 @@ class Misc(Cog):
     async def botinvite_command(self, ctx):
         invite = f"https://discord.com/oauth2/authorize?client_id={self.client.user.id}&permissions=0&scope=bot"
         await ctx.send(invite)
-    
 
     @command(name="newronbpost")
-    async def newronbpost_command(self,ctx):
-        for post in get_posts('officialroutineofnepalbanda', pages=3):
+    async def newronbpost_command(self, ctx):
+        for post in get_posts('officialroutineofnepalbanda', pages=3, credentials=(FB_EMAIL, FB_PASS)):
             text = (post['text'][:1000])
             image = post["image"]
             break
         embed = Embed(
-            color = Color.blurple(),
-            timestamp = datetime.utcnow(),
-            description = text
+            color=Color.blurple(),
+            timestamp=datetime.utcnow(),
+            description=text
         )
         embed.set_author(name=f"Latest post from Routine of Nepal banda")
-        embed.set_thumbnail(url="https://english.onlinekhabar.com/wp-content/uploads/2021/04/routine-of-nepal-banda-1024x1024.jpg")
+        embed.set_thumbnail(
+            url="https://english.onlinekhabar.com/wp-content/uploads/2021/04/routine-of-nepal-banda-1024x1024.jpg")
         if image is not None:
-            embed.set_image(url = image)
+            embed.set_image(url=image)
         await ctx.send(embed=embed)
-        
 
 
 def setup(client):
