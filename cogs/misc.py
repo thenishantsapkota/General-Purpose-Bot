@@ -111,23 +111,23 @@ class Misc(Cog):
         invite = f"https://discord.com/oauth2/authorize?client_id={self.client.user.id}&permissions=0&scope=bot"
         await ctx.send(invite)
 
-    @command(name="newronbpost")
-    async def newronbpost_command(self, ctx):
-        for post in get_posts('officialroutineofnepalbanda', pages=3, credentials=(FB_EMAIL, FB_PASS)):
-            text = (post['text'][:1000])
-            image = post["image"]
-            break
-        embed = Embed(
-            color=Color.blurple(),
-            timestamp=datetime.utcnow(),
-            description=text
-        )
-        embed.set_author(name=f"Latest post from Routine of Nepal banda")
-        embed.set_thumbnail(
-            url="https://english.onlinekhabar.com/wp-content/uploads/2021/04/routine-of-nepal-banda-1024x1024.jpg")
-        if image is not None:
-            embed.set_image(url=image)
-        await ctx.send(embed=embed)
+    # @command(name="newronbpost")
+    # async def newronbpost_command(self, ctx):
+    #     for post in get_posts('officialroutineofnepalbanda', pages=3, credentials=(FB_EMAIL, FB_PASS)):
+    #         text = (post['text'][:1000])
+    #         image = post["image"]
+    #         break
+    #     embed = Embed(
+    #         color=Color.blurple(),
+    #         timestamp=datetime.utcnow(),
+    #         description=text
+    #     )
+    #     embed.set_author(name=f"Latest post from Routine of Nepal banda")
+    #     embed.set_thumbnail(
+    #         url="https://english.onlinekhabar.com/wp-content/uploads/2021/04/routine-of-nepal-banda-1024x1024.jpg")
+    #     if image is not None:
+    #         embed.set_image(url=image)
+    #     await ctx.send(embed=embed)
 
 
 def setup(client):
