@@ -1,10 +1,16 @@
 from datetime import date
 from pathlib import Path
-
+from dotenv import load_dotenv
 import aiohttp
 
 from modules.imports import *
 
+
+load_dotenv()
+env_path = Path(".") / ".env"
+load_dotenv(dotenv_path=env_path)
+
+WEATHER_TOKEN = os.getenv("WEATHER_API_TOKEN")
 
 
 class Misc(Cog):
@@ -99,7 +105,6 @@ class Misc(Cog):
     async def botinvite_command(self, ctx):
         invite = f"https://discord.com/oauth2/authorize?client_id={self.client.user.id}&permissions=0&scope=bot"
         await ctx.send(invite)
-        
 
     @command(name="countryinfo")
     async def countryinfo_command(self, ctx, *, countryname: str):
@@ -163,6 +168,34 @@ class Misc(Cog):
         embed.set_author(name=f"Github Profile info of username {githubusername}")
         if avatar_url is not None:
             embed.set_thumbnail(url=avatar_url)
+        await ctx.send(embed=embed)
+
+    @command(name="weather")
+    async def weather_command(self, ctx, *, cityName: str):
+        base_url = "http://api.openweathermap.org/data/2.5/weather?"
+        complete_url = base_url + "appid=" + WEATHER_TOKEN + "&q=" + cityName
+        image = "https://icons-for-free.com/iconfiles/png/512/fog+foggy+weather+icon-1320196634851598977.png"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(complete_url) as resp:
+                data = await resp.json()
+                main = data["main"]
+                wind = data["wind"]
+                weather = data["weather"]
+                city = data["name"]
+                temperature_in_celcius = int(main["temp"] - 273)
+                feelslike_in_celcius = int(main["feels_like"] - 273)
+                max_tempr = int(main["temp_max"] - 273)
+                min_tempr = int(main["temp_min"] - 273)
+                wind = data["wind"]
+                speed_wind = wind["speed"]
+                weather_description = str(weather[0]["description"]).title()
+        embed = Embed(
+            color=Color.blurple(),
+            timestamp=datetime.utcnow(),
+            description=f"**Temperature** - {temperature_in_celcius} °C\n**Feels like** - {feelslike_in_celcius} °C\n**Maximum Temperature** - {max_tempr} °C\n**Minimum Temperature** - {min_tempr} °C\n**Description** - {weather_description}\n**Wind Velocity** - {speed_wind} km/h",
+        )
+        embed.set_author(name=f"Weather of {cityName.title()}")
+        embed.set_thumbnail(url=image)
         await ctx.send(embed=embed)
 
 
