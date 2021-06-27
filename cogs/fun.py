@@ -51,6 +51,9 @@ class Fun(Cog):
 
     @command(name="wink")
     async def wink_command(self, ctx, member: Member):
+        if member is ctx.author:
+            await ctx.send("You cannot wink at yourself. That's weird.")
+            return
         async with aiohttp.ClientSession() as session:
             async with session.get("https://some-random-api.ml/animu/wink") as resp:
                 wink = await resp.json()
@@ -62,6 +65,9 @@ class Fun(Cog):
 
     @command(name="pat")
     async def pat_command(self, ctx, member: Member):
+        if member is ctx.author:
+            await ctx.send("You cannot pat yourself. You lonely shit.")
+            return
         async with aiohttp.ClientSession() as session:
             async with session.get("https://some-random-api.ml/animu/pat") as resp:
                 pat = await resp.json()
@@ -73,6 +79,9 @@ class Fun(Cog):
 
     @command(name="hug")
     async def hug_command(self, ctx, member: Member):
+        if member is ctx.author:
+            await ctx.send("You cannot hug yourself. You lonely shit.")
+            return
         async with aiohttp.ClientSession() as session:
             async with session.get("https://some-random-api.ml/animu/hug") as resp:
                 hug = await resp.json()
