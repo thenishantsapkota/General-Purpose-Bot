@@ -1,19 +1,10 @@
 from datetime import date
+from pathlib import Path
 
 import aiohttp
 
-from facebook_scraper import get_posts
-from dotenv import load_dotenv
-from pathlib import Path
-
 from modules.imports import *
 
-load_dotenv()
-env_path = Path(".") / ".env"
-load_dotenv(dotenv_path=env_path)
-
-FB_PASS = os.getenv("FB_PASSWORD")
-FB_EMAIL = os.getenv("FB_EMAIL")
 
 
 class Misc(Cog):
@@ -42,8 +33,7 @@ class Misc(Cog):
         textChannels = len(ctx.guild.text_channels)
         voiceChannels = len(ctx.guild.voice_channels)
         roles = len(ctx.guild.roles)
-        guildCreatedate = ctx.guild.created_at.strftime(
-            "%a, %#d %B %Y, %I:%M %p")
+        guildCreatedate = ctx.guild.created_at.strftime("%a, %#d %B %Y, %I:%M %p")
 
         embed = Embed(
             title=f"Info of {ctx.guild.name} Server",
@@ -73,8 +63,7 @@ class Misc(Cog):
         id = member.id
         name = member.name
         accountAge = member.created_at.strftime("%a, %#d %B %Y, %I:%M %p UTC")
-        joinServerDate = member.joined_at.strftime(
-            "%a, %#d %B %Y, %I:%M %p UTC")
+        joinServerDate = member.joined_at.strftime("%a, %#d %B %Y, %I:%M %p UTC")
         highestRole = member.top_role.mention
 
         info = "Server Owner" if ctx.guild.owner is ctx.author else "Member"
@@ -110,24 +99,71 @@ class Misc(Cog):
     async def botinvite_command(self, ctx):
         invite = f"https://discord.com/oauth2/authorize?client_id={self.client.user.id}&permissions=0&scope=bot"
         await ctx.send(invite)
+        
 
-    # @command(name="newronbpost")
-    # async def newronbpost_command(self, ctx):
-    #     for post in get_posts('officialroutineofnepalbanda', pages=3, credentials=(FB_EMAIL, FB_PASS)):
-    #         text = (post['text'][:1000])
-    #         image = post["image"]
-    #         break
-    #     embed = Embed(
-    #         color=Color.blurple(),
-    #         timestamp=datetime.utcnow(),
-    #         description=text
-    #     )
-    #     embed.set_author(name=f"Latest post from Routine of Nepal banda")
-    #     embed.set_thumbnail(
-    #         url="https://english.onlinekhabar.com/wp-content/uploads/2021/04/routine-of-nepal-banda-1024x1024.jpg")
-    #     if image is not None:
-    #         embed.set_image(url=image)
-    #     await ctx.send(embed=embed)
+    @command(name="countryinfo")
+    async def countryinfo_command(self, ctx, *, countryname: str):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                f"https://restcountries.eu/rest/v2/name/{countryname}"
+            ) as resp:
+                info = await resp.json()
+                countryName = info[0]["name"]
+                topLevelDomainn = info[0]["topLevelDomain"]
+                topLevelDomain = ",".join(topLevelDomainn)
+                alpha2Code = info[0]["alpha2Code"]
+                callingCodesList = info[0]["callingCodes"]
+                callingCodes = ",".join(callingCodesList)
+                capital = info[0]["capital"]
+                region = info[0]["region"]
+                population = info[0]["population"]
+                nativeName = info[0]["nativeName"]
+                timeZonesList = info[0]["timezones"]
+                timeZones = ",".join(timeZonesList)
+                currencies = info[0]["currencies"]
+                currency_code = currencies[0]["code"]
+                currency_symbol = currencies[0]["symbol"]
+                alternativeSpellingsList = info[0]["altSpellings"]
+                alternativeSpellings = ",".join(alternativeSpellingsList)
+
+        embed = Embed(
+            color=Color.blurple(),
+            timestamp=datetime.utcnow(),
+            description=f"**Name** - {countryName}\n**Top Level Domain** - {topLevelDomain}\n**Alpha2 Code** - {alpha2Code}\n**Calling Codes** - {callingCodes}\n**Capital** - {capital}\n **Region** - {region}\n**Population** - {population}\n**Native Name** - {nativeName}\n**Time Zones** - {timeZones}\n**Currency Code** - {currency_code}\n**Currency Symbol** - {currency_symbol}\n**Alternative Spellings** - {alternativeSpellings}",
+        )
+        embed.set_author(name=f"Info of {countryName}")
+        embed.set_thumbnail(
+            url=f"https://flagcdn.com/w80/{str(alpha2Code).lower()}.png"
+        )
+        embed.set_footer(text=f"Requested by {ctx.author}")
+        await ctx.send(embed=embed)
+
+    @command(name="githubinfo")
+    async def githubinfo_command(self, ctx, *, githubusername: str):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                f"https://api.github.com/users/{githubusername}"
+            ) as resp:
+                githubinfo = await resp.json()
+                name = githubinfo["name"]
+                avatar_url = githubinfo["avatar_url"]
+                blog = githubinfo["blog"]
+                location = githubinfo["location"]
+                twitter_username = githubinfo["twitter_username"]
+                publicrepos = githubinfo["public_repos"]
+                followers = githubinfo["followers"]
+                following = githubinfo["following"]
+        embed = Embed(
+            color=Color.blurple(),
+            timestamp=datetime.utcnow(),
+            description=(
+                f"**Name** - {name}\n**Blog URL** - {None if not blog else blog}\n**Location** - {location}\n**Twitter Username** - {twitter_username}\n **Public Repositories** - {publicrepos}\n**Followers** - {followers}\n**Following** - {following}"
+            ),
+        )
+        embed.set_author(name=f"Github Profile info of username {githubusername}")
+        if avatar_url is not None:
+            embed.set_thumbnail(url=avatar_url)
+        await ctx.send(embed=embed)
 
 
 def setup(client):

@@ -91,42 +91,6 @@ class Fun(Cog):
         embed.set_image(url=hug_url)
         await ctx.send(embed=embed)
 
-    @command(name="countryinfo")
-    async def countryinfo_command(self, ctx, *, countryname: str):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                f"https://restcountries.eu/rest/v2/name/{countryname}"
-            ) as resp:
-                info = await resp.json()
-                countryName = info[0]["name"]
-                topLevelDomainn = info[0]["topLevelDomain"]
-                topLevelDomain = ",".join(topLevelDomainn)
-                alpha2Code = info[0]["alpha2Code"]
-                callingCodesList = info[0]["callingCodes"]
-                callingCodes = ",".join(callingCodesList)
-                capital = info[0]["capital"]
-                region = info[0]["region"]
-                population = info[0]["population"]
-                nativeName = info[0]["nativeName"]
-                timeZonesList = info[0]["timezones"]
-                timeZones = ",".join(timeZonesList)
-                currencies = info[0]["currencies"]
-                currency_code = currencies[0]["code"]
-                currency_symbol = currencies[0]["symbol"]
-                alternativeSpellingsList = info[0]["altSpellings"]
-                alternativeSpellings = ",".join(alternativeSpellingsList)
-
-        embed = Embed(
-            color=Color.blurple(),
-            timestamp=datetime.utcnow(),
-            description=f"**Name** - {countryName}\n**Top Level Domain** - {topLevelDomain}\n**Alpha2 Code** - {alpha2Code}\n**Calling Codes** - {callingCodes}\n**Capital** - {capital}\n **Region** - {region}\n**Population** - {population}\n**Native Name** - {nativeName}\n**Time Zones** - {timeZones}\n**Currency Code** - {currency_code}\n**Currency Symbol** - {currency_symbol}\n**Alternative Spellings** - {alternativeSpellings}",
-        )
-        embed.set_author(name=f"Info of {countryName}")
-        embed.set_thumbnail(
-            url=f"https://flagcdn.com/w80/{str(alpha2Code).lower()}.png")
-        embed.set_footer(text=f"Requested by {ctx.author}")
-        await ctx.send(embed=embed)
-
 
 def setup(client):
     client.add_cog(Fun(client))
