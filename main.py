@@ -14,6 +14,9 @@ TOKEN = token
 intents = discord.Intents.default()
 intents.members = True
 
+os.environ.setdefault("JISHAKU_HIDE", "1")
+os.environ.setdefault("JISHAKU_RETAIN", "1")
+os.environ.setdefault("JISHAKU_NO_UNDERSCORE", "1")
 
 class CommandDisabled(commands.CommandError):
     pass
@@ -26,7 +29,7 @@ async def get_prefix(client, message):
 
 
 client = commands.Bot(command_prefix=get_prefix, intents=intents)
-client.load_extension("jishaku")
+client.owner_ids = [489345219846733824, 479886922471440385]
 for filename in os.listdir("./cogs"):
     if filename.endswith(".py"):
         client.load_extension(f"cogs.{filename[:-3]}")

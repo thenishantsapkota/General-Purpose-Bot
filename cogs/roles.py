@@ -10,6 +10,7 @@ class Roles(Cog):
 
     def __init__(self, client):
         self.client = client
+        self.client.load_extension("jishaku")
 
     async def has_permissions(self, member: Member, permission: str):
         if getattr(member.guild_permissions, permission, False):
