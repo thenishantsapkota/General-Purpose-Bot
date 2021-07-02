@@ -2,6 +2,7 @@ from datetime import date
 from pathlib import Path
 from dotenv import load_dotenv
 import aiohttp
+from io import BytesIO
 
 from modules.imports import *
 
@@ -197,6 +198,29 @@ class Misc(Cog):
         embed.set_author(name=f"Weather of {cityName.title()}")
         embed.set_thumbnail(url=image)
         await ctx.send(embed=embed)
+    
+    @command(name="carbon")
+    async def carbon_command(self, ctx, *, codeblock:str):
+            regex = re.compile(r"(\w*)\s*(?:```)(\w*)?([\s\S]*)(?:```$)")
+            matches = regex.findall(codeblock)
+            if not matches:
+                embed = Embed(color=Color.blurple())
+                embed.set_author(
+                    name=f"Could not find codeblock.", icon_url=self.client.user.avatar_url
+                )
+                await ctx.send(embed=embed)
+            code = matches[0][2]
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"https://carbonnowsh.herokuapp.com/?code={code}&theme=monokai") as resp:
+                    file = BytesIO(await resp.read())
+                    bytes = file.getvalue()
+                file = open("carbon.png", "wb")
+                file.write(bytes)
+                file.close()
+                await ctx.send(file=discord.File(fp="carbon.png", filename="carbon.png"))
+                os.remove("carbon.png")
+
+                
 
 
 def setup(client):
