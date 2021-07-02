@@ -210,8 +210,13 @@ class Misc(Cog):
                 )
                 await ctx.send(embed=embed)
             code = matches[0][2]
+            splitted_code = str(code).splitlines()
+            codes = []
+            codes = "%250A".join(splitted_code)
+            #print(codes)
+            
             async with aiohttp.ClientSession() as session:
-                async with session.get(f"https://carbonnowsh.herokuapp.com/?code={code}&theme=monokai") as resp:
+                async with session.get(f"https://carbonnowsh.herokuapp.com/?code={codes}&theme=monokai") as resp:
                     file = BytesIO(await resp.read())
                     bytes = file.getvalue()
                 file = open("carbon.png", "wb")
