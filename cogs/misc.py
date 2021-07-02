@@ -3,6 +3,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import aiohttp
 from io import BytesIO
+import urllib.parse
 
 from modules.imports import *
 
