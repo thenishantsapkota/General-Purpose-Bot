@@ -1,4 +1,5 @@
 from datetime import date
+from logging import log
 from pathlib import Path
 from dotenv import load_dotenv
 import aiohttp
@@ -202,29 +203,52 @@ class Misc(Cog):
     
     @command(name="carbon")
     async def carbon_command(self, ctx, *, codeblock:str):
-            regex = re.compile(r"(\w*)\s*(?:```)(\w*)?([\s\S]*)(?:```$)")
-            matches = regex.findall(codeblock)
-            if not matches:
-                embed = Embed(color=Color.blurple())
-                embed.set_author(
-                    name=f"Could not find codeblock.", icon_url=self.client.user.avatar_url
-                )
-                await ctx.send(embed=embed)
-            code = matches[0][2]
-            splitted_code = str(code).splitlines()
-            codes = []
-            codes = "%250A".join(splitted_code)
-            #print(codes)
-            
-            async with aiohttp.ClientSession() as session:
-                async with session.get(f"https://carbonnowsh.herokuapp.com/?code={codes}&theme=monokai") as resp:
-                    file = BytesIO(await resp.read())
-                    bytes = file.getvalue()
-                file = open("carbon.png", "wb")
-                file.write(bytes)
-                file.close()
-                await ctx.send(file=discord.File(fp="carbon.png", filename="carbon.png"))
-                os.remove("carbon.png")
+        regex = re.compile(r"(\w*)\s*(?:```)(\w*)?([\s\S]*)(?:```$)")
+        matches = regex.findall(codeblock)
+        if not matches:
+            embed = Embed(color=Color.blurple())
+            embed.set_author(
+                name=f"Could not find codeblock.", icon_url=self.client.user.avatar_url
+            )
+            await ctx.send(embed=embed)
+        code = matches[0][2]
+        splitted_code = str(code).splitlines()
+        codes = []
+        codes = "%250A".join(splitted_code)
+        #print(codes)
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"https://carbonnowsh.herokuapp.com/?code={codes}&theme=monokai") as resp:
+                file = BytesIO(await resp.read())
+                bytes = file.getvalue()
+            file = open("carbon.png", "wb")
+            file.write(bytes)
+            file.close()
+            await ctx.send(file=discord.File(fp="carbon.png", filename="carbon.png"))
+            os.remove("carbon.png")
+    @command(name="c19")
+    async def c19_command(self, ctx, *, country:Optional[str]):
+        country = country or "nepal"
+        logoUrl = "http://covidcp.org/images/logo-icononly.png"
+        url = f"https://coronavirus-19-api.herokuapp.com/countries/{country}"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                data = await resp.json()
+                cntry = data["country"]
+                cases = data["cases"]
+                todayCases = data["todayCases"]
+                deaths = data["deaths"]
+                recovered = data["recovered"]
+                active = data["active"]
+        output = f"Total Cases - **{cases}** \n Cases Today - **{todayCases}** \nTotal Deaths - **{deaths}** \nActive Cases - **{active}** \nTotal Recovered - **{recovered}**"
+        embed = Embed(
+            color = Color.blurple(),
+            timestamp = datetime.utcnow(),
+            description = output
+        )
+        embed.set_author(name=f"COVID-19 Stats for {cntry}")
+        embed.set_thumbnail(url=logoUrl)
+        await ctx.send(embed=embed)
 
                 
 

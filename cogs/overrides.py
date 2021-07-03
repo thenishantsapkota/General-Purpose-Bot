@@ -47,7 +47,24 @@ class CmdOverrides(Cog):
 
     @toggle.command(name="all")
     async def toggleall(self, ctx, command: str, toggle: bool):
-        await self.toggle_handler(ctx, command, ctx.guild.text_channels, toggle)
+        #await self.toggle_handler(ctx, command, ctx.guild.text_channels, toggle)
+        command = self.client.get_command(command)
+        if not command:
+            await ctx.send(f"`{command}` is not a valid command.")
+        if command == ctx.command:
+            await ctx.send(f"You cannot disable this command.")
+
+        else:
+            for channel in ctx.guild.text_channels:
+                model, _ = await OverrideModel.get_or_create(
+                    guild_id=ctx.guild.id,
+                    command_name=command.name,
+                    channel_id=channel.id,
+                )
+                model.enable = toggle
+                await model.save()
+            toggle_string = "enabled" if toggle else "disabled"
+            await ctx.send(f"`{command.name}` {toggle_string} in all channels")
 
     @command()
     async def check(self, ctx, command: str, channel: Optional[TextChannel]):
