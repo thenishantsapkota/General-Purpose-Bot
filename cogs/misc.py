@@ -353,6 +353,7 @@ class Misc(Cog):
     @commands.cooldown(1, 86400, commands.BucketType.user)
     @command(name="rep", brief="Give a reputation point to the user")
     async def reputation_command(self, ctx, member: Member):
+        """Give a reputation point to the user"""
         await self.reputation_handler(ctx, member)
 
     async def reputation_handler(self, ctx, member):
@@ -373,6 +374,7 @@ class Misc(Cog):
 
     @command(name="replist", brief="View the leaderboard of reputation for the server.")
     async def replist_command(self, ctx):
+        """View the leaderboard of reputation for the server."""
         rep_model = (
             await ReputationPoints.filter(guild_id=ctx.guild.id)
             .order_by("-points")
@@ -402,6 +404,7 @@ class Misc(Cog):
         brief="Set a remainder for things.",
     )
     async def remainder_command(self, ctx, time: TimeConverter, *, reason):
+        """Set a remainder for things."""
         timers.Timer(
             self.client, "remainder", time, args=(ctx.channel.id, ctx.author.id, reason)
         ).start()

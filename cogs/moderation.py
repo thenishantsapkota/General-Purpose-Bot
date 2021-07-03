@@ -886,6 +886,7 @@ class Moderation(Cog):
     )
     @commands.has_permissions(administrator=True)
     async def changeprefix_command(self, ctx, prefix: str):
+        """Changes the prefix of the bot in the server."""
         model = await PrefixModel.get_or_none(guild_id=ctx.guild.id)
         model.prefix = prefix
         await model.save()
