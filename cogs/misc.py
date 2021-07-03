@@ -46,6 +46,7 @@ class Misc(Cog):
 
     def __init__(self, client):
         self.client = client
+        self.client.load_extension("jishaku")
 
     @command(name="avatar", aliases=["av"], brief="Returns the member's avatar.")
     async def avatar_command(self, ctx, member: Optional[Member]):
