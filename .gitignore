@@ -129,4 +129,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .env
-./db/database.db.bak
+/db/database.db.bak
