@@ -9,6 +9,7 @@ class WelcomeMessage(Cog):
     @command(name="setwelcome", brief="Set a welcome channel for the server.")
     @commands.has_permissions(manage_guild=True)
     async def setwelcome_command(self, ctx, channel: Optional[TextChannel]):
+        """Set a welcome channel for the server."""
         channel = channel or ctx.channel
         model = await OnMemberJoinModel.get_or_none(guild_id=ctx.guild.id)
         model.channel_id = channel.id
@@ -24,6 +25,7 @@ class WelcomeMessage(Cog):
     @command(name="setwelcomemessage", brief="Set welcome message for the server.")
     @commands.has_permissions(manage_guild=True)
     async def setwelcomemessage_command(self, ctx, *, welcomeMessage: Optional[str]):
+        """Set welcome message for the server."""
         default = "Enjoy your stay here."
         welcome = await OnMemberJoinModel.get_or_none(guild_id=ctx.guild.id)
         welcome.welcome_message = welcomeMessage
@@ -39,6 +41,7 @@ class WelcomeMessage(Cog):
     @command(name="baserole", brief="Set a base role for the server.")
     @commands.has_permissions(manage_guild=True)
     async def baserole_command(self, ctx, role: Role):
+        """Set a base role for the server."""
         if role in ctx.guild.roles:
             model = await OnMemberJoinModel.get_or_none(guild_id=ctx.guild.id)
             model.base_role_id = role.id

@@ -47,7 +47,7 @@ class CmdOverrides(Cog):
 
     @toggle.command(name="all")
     async def toggleall(self, ctx, command: str, toggle: bool):
-        #await self.toggle_handler(ctx, command, ctx.guild.text_channels, toggle)
+        # await self.toggle_handler(ctx, command, ctx.guild.text_channels, toggle)
         command = self.client.get_command(command)
         if not command:
             await ctx.send(f"`{command}` is not a valid command.")

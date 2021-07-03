@@ -11,6 +11,7 @@ class Fun(Cog):
 
     @command(name="catfact", brief="Returns a cat fact.")
     async def catfact_command(self, ctx):
+        """Returns a cat fact."""
         async with aiohttp.ClientSession() as session:
             async with session.get("https://some-random-api.ml/facts/cat") as resp:
                 cat_fact = await resp.json()
@@ -28,6 +29,7 @@ class Fun(Cog):
 
     @command(name="dogfact", brief="Returns a dog fact.")
     async def dogfact_command(self, ctx):
+        """Returns a dog fact."""
         async with aiohttp.ClientSession() as session:
             async with session.get("https://some-random-api.ml/facts/dog") as resp:
                 dog_fact = await resp.json()
@@ -43,14 +45,16 @@ class Fun(Cog):
         embed.set_footer(text=f"Requested by {ctx.author.name}")
         await ctx.send(embed=embed)
 
-    @command(name="iqcheck")
+    @command(name="iqcheck", brief="Return the IQ Value of the member.")
     async def iqcheck_command(self, ctx, member: Optional[Member]):
+        """Return the IQ Value of the member."""
         member = member or ctx.author
         integer = random.randint(1, 200)
         await ctx.send(f"**{member}'s IQ is {integer}.**")
 
-    @command(name="wink")
+    @command(name="wink", brief="Wink at the member provided.")
     async def wink_command(self, ctx, member: Member):
+        """Wink at the member provided."""
         if member is ctx.author:
             await ctx.send("You cannot wink at yourself. That's weird.")
             return
@@ -63,8 +67,9 @@ class Fun(Cog):
         embed.set_image(url=wink_url)
         await ctx.send(embed=embed)
 
-    @command(name="pat")
+    @command(name="pat", brief="Pat the member provided.")
     async def pat_command(self, ctx, member: Member):
+        """Pat the member provided."""
         if member is ctx.author:
             await ctx.send("You cannot pat yourself. You lonely shit.")
             return
@@ -77,8 +82,9 @@ class Fun(Cog):
         embed.set_image(url=pat_url)
         await ctx.send(embed=embed)
 
-    @command(name="hug")
+    @command(name="hug", brief="Hug the member provided.")
     async def hug_command(self, ctx, member: Member):
+        """Hug the member provided."""
         if member is ctx.author:
             await ctx.send("You cannot hug yourself. You lonely shit.")
             return

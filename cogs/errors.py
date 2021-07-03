@@ -2,6 +2,10 @@ from modules.imports import *
 
 
 class ErrorHandler(Cog):
+    """
+    Error handler for the bot.
+    """
+
     def __init__(self, client):
         self.client = client
 

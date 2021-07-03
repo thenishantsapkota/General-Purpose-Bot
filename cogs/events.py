@@ -1,8 +1,14 @@
+import asyncio
+
 from models import OnMemberJoinModel, PrefixModel
 from modules.imports import *
 
 
 class Events(Cog):
+    """
+    Cog to handle Events of the bot
+    """
+
     def __init__(self, client):
         self.client = client
 

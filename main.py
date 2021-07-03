@@ -18,6 +18,7 @@ os.environ.setdefault("JISHAKU_HIDE", "1")
 os.environ.setdefault("JISHAKU_RETAIN", "1")
 os.environ.setdefault("JISHAKU_NO_UNDERSCORE", "1")
 
+
 class CommandDisabled(commands.CommandError):
     pass
 

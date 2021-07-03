@@ -1,10 +1,11 @@
 from datetime import date, timedelta
+from io import BytesIO
 from re import A
 from typing import Text
 
 import pytz
 
-from models import ModerationRoles, MuteModel, WarnModel
+from models import ModerationRoles, MuteModel, PrefixModel, WarnModel
 from modules.imports import *
 
 
@@ -47,6 +48,7 @@ class Moderation(Cog):
         *,
         reason: Optional[str] = "No Reason Specified.",
     ):
+        """Mute a member from the server."""
         author = ctx.author
         guild = ctx.guild
         staffrole = (await self.fetchRoleData(guild)).get("staffrole")
@@ -186,6 +188,7 @@ class Moderation(Cog):
         *,
         reason: Optional[str] = "No reason provided.",
     ):
+        """Unmute a member from the server."""
         modrole = (await self.fetchRoleData(ctx.guild)).get("modrole")
         if not (
             await self.has_permissions(ctx.author, "kick_members")
@@ -249,6 +252,7 @@ class Moderation(Cog):
         *,
         reason: Optional[str] = "No reason provided",
     ):
+        """Kick the member from the server."""
         author = ctx.author
         guild = ctx.guild
         modrole = (await self.fetchRoleData(guild)).get("modrole")
@@ -291,10 +295,10 @@ class Moderation(Cog):
         name="ban",
         aliases=["hammer"],
         brief="Bans the member from the server.",
-        description="Bans the member from the server.",
     )
     # @commands.has_permissions(ban_members=True)
     async def ban_command(self, ctx, members: Greedy[User], *, reason):
+        """Bans the member from the server."""
         author = ctx.author
         guild = ctx.guild
         modrole = (await self.fetchRoleData(guild)).get("modrole")
@@ -339,6 +343,7 @@ class Moderation(Cog):
     async def unban_command(
         self, ctx, user: User, *, reason: Optional[str] = "No reason specified."
     ):
+        """Unban the user from the server."""
         author = ctx.author
         guild = ctx.guild
         modrole = (await self.fetchRoleData(guild)).get("modrole")
@@ -397,6 +402,7 @@ class Moderation(Cog):
     @command(name="warn", brief="Warns the user.")
     # @commands.has_permissions(manage_messages=True)
     async def warn_command(self, ctx, members: Greedy[Member], *, reason):
+        """Warns the user."""
         author = ctx.author
         guild = ctx.guild
 
@@ -462,6 +468,7 @@ class Moderation(Cog):
     @command(name="warnings", brief="View warnings of the user.")
     # @commands.has_permissions(manage_messages=True)
     async def warnings_command(self, ctx, member: Optional[Member]):
+        """View warnings of the user."""
         author = ctx.author
         guild = ctx.guild
         staffrole = (await self.fetchRoleData(guild)).get("staffrole")
@@ -493,6 +500,7 @@ class Moderation(Cog):
     @command(name="delwarning", brief="Delete a warning of a user.")
     # @commands.has_permissions(kick_members=True)
     async def delwarning_command(self, ctx, id: int):
+        """Delete a warning of a user."""
         guild = ctx.guild
         author = ctx.author
         modrole = (await self.fetchRoleData(guild)).get("modrole")
@@ -510,6 +518,7 @@ class Moderation(Cog):
     @command(name="clw", brief="Clear the warnings of the member.")
     # @commands.has_permissions(administrator=True)
     async def clw_command(self, ctx, member: Member):
+        """Clear the warnings of the member."""
         author = ctx.author
         guild = ctx.guild
         adminrole = (await self.fetchRoleData(guild)).get("adminrole")
@@ -531,6 +540,7 @@ class Moderation(Cog):
     @command(name="adminroleset", brief="Set administrator role for the server.")
     @commands.has_permissions(administrator=True)
     async def adminroleset_command(self, ctx, role: Role):
+        """Set administrator role for the server."""
         guild = ctx.guild
         author = ctx.author
 
@@ -549,6 +559,7 @@ class Moderation(Cog):
     @command(name="modroleset", brief="Set moderator role for the server.")
     @commands.has_permissions(administrator=True)
     async def modroleset_command(self, ctx, role: Role):
+        """Set moderator role for the server."""
         guild = ctx.guild
         author = ctx.author
 
@@ -567,6 +578,7 @@ class Moderation(Cog):
     @command(name="staffroleset", brief="Set staff role for the server.")
     @commands.has_permissions(administrator=True)
     async def staffroleset_command(self, ctx, role: Role):
+        """Set staff role for the server."""
         guild = ctx.guild
         author = ctx.author
 
@@ -585,6 +597,7 @@ class Moderation(Cog):
     @command(name="lockchannel", brief="Lock the channel provided")
     # @commands.has_permissions(manage_channels=True)
     async def lockchannel_command(self, ctx, channel: Optional[TextChannel]):
+        """Lock the channel provided"""
         guild = ctx.guild
         author = ctx.author
         channel = channel or ctx.channel
@@ -621,6 +634,7 @@ class Moderation(Cog):
     @command(name="unlockchannel", brief="Unlock the channel provided.")
     # @commands.has_permissions(manage_channels=True)
     async def unlockchannel_command(self, ctx, channel: Optional[TextChannel]):
+        """Unlock the channel provided."""
         guild = ctx.guild
         channel = channel or ctx.channel
         author = ctx.author
@@ -660,6 +674,7 @@ class Moderation(Cog):
     )
     # @commands.has_permissions(manage_channels=True)
     async def lockdown_command(self, ctx):
+        """Lockdown the server."""
         author = ctx.author
         guild = ctx.guild
         modrole = (await self.fetchRoleData(guild)).get("modrole")
@@ -724,6 +739,7 @@ class Moderation(Cog):
     @command(name="giverole", aliases=["addrole"], brief="Add a role to the user.")
     # @commands.has_permissions(administrator=True)
     async def giverole_command(self, ctx, member: Optional[Member], *, role: Role):
+        """Add a role to the user."""
         author = ctx.author
         guild = ctx.guild
         adminrole = (await self.fetchRoleData(guild)).get("adminrole")
@@ -753,6 +769,7 @@ class Moderation(Cog):
     )
     # @commands.has_permissions(administrator=True)
     async def takerole_command(self, ctx, member: Optional[Member], *, role: Role):
+        """Remove a role from the user"""
         author = ctx.author
         guild = ctx.guild
         adminrole = (await self.fetchRoleData(guild)).get("adminrole")
@@ -780,6 +797,7 @@ class Moderation(Cog):
     @command(name="slowmode", brief="Add slowmode to the channel you invoke it in.")
     # @commands.has_permissions(manage_channels=True)
     async def slowmode_command(self, ctx, channel: Optional[TextChannel], seconds: int):
+        """Add slowmode to the channel you invoke it in."""
         author = ctx.author
         guild = ctx.guild
         modrole = (await self.fetchRoleData(guild)).get("modrole")
@@ -798,6 +816,84 @@ class Moderation(Cog):
         embed.set_author(
             name=description if seconds != 0 else "Slowmode disabled in this channel.",
             icon_url=author.avatar_url,
+        )
+        await ctx.send(embed=embed)
+
+    @command(name="members")
+    async def members_in_role(self, ctx, role: Role):
+        members = []
+        guild = ctx.guild
+        author = ctx.author
+        staffrole = (await self.fetchRoleData(guild)).get("staffrole")
+        if not (
+            await self.has_permissions(author, "manage_messages")
+            or await self.rolecheck(author, staffrole)
+        ):
+            raise NotEnoughPermissions(
+                "You don't have either the roles required or the permissions."
+            )
+        for member in guild.members:
+            if role in member.roles:
+                members.append(member.mention)
+
+        members_list = "\n".join(members[:15])
+        embed = Embed(
+            color=Color.blurple(), timestamp=datetime.utcnow(), description=members_list
+        )
+        embed.set_author(name=f"Members in {role}")
+        embed.set_footer(text=f"Invoked by {author}")
+        await ctx.send(embed=embed)
+
+    @command(aliases=["addem"], brief="Add an emote to the server.")
+    @commands.has_permissions(manage_emojis=True)
+    async def createemoji(self, ctx, url: str, *, name):
+        """Add an emote to the server using the url of the emote."""
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as r:
+                try:
+                    if r.status in range(200, 299):
+                        emj = BytesIO(await r.read())
+                        bytes = emj.getvalue()
+                        emoji = await ctx.guild.create_custom_emoji(
+                            image=bytes, name=name
+                        )
+                        await ctx.send(
+                            f"Emote sucessfully created | <:{emoji.name}:{emoji.id}>"
+                        )
+                    else:
+                        await ctx.send(f"Error making request | Response: {r.status}")
+                except discord.HTTPException:
+                    await ctx.send("File size may be too big.")
+
+    @command(aliases=["renameem"], brief="Rename the emoji of the server.")
+    @commands.has_permissions(manage_emojis=True)
+    async def renameemoji(self, ctx, emoji: discord.Emoji, *, name):
+        """Rename the emoji of the server."""
+        await ctx.send(f"{emoji} | Emote name changed to `{name}`")
+        await emoji.edit(name=name, reason="Emoji Name Edit")
+
+    @command(aliases=["delem"], brief="Delete an emoji from the server.")
+    @commands.has_permissions(manage_emojis=True)
+    async def deleteemoji(self, ctx, emoji: discord.Emoji):
+        """Delete an emoji from the server."""
+        await ctx.send(f"{emoji} | Emote deleted sucessfully.")
+        await emoji.delete()
+
+    @command(
+        name="changeprefix",
+        aliases=["chp"],
+        brief="Changes the prefix of the bot in the server.",
+    )
+    @commands.has_permissions(administrator=True)
+    async def changeprefix_command(self, ctx, prefix: str):
+        model = await PrefixModel.get_or_none(guild_id=ctx.guild.id)
+        model.prefix = prefix
+        await model.save()
+        embed = Embed(
+            title="Prefix Changed",
+            description=f"Prefix for {ctx.guild.name} has been changed to `{prefix}`",
+            color=Color.blurple(),
+            timestamp=datetime.utcnow(),
         )
         await ctx.send(embed=embed)
 

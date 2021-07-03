@@ -15,16 +15,8 @@ import aiohttp
 import discord
 import jishaku
 import requests
-from discord import (
-    Color,
-    DMChannel,
-    Embed,
-    Member,
-    Role,
-    TextChannel,
-    User,
-    VoiceChannel,
-)
+from discord import (Color, DMChannel, Embed, Member, Role, TextChannel, User,
+                     VoiceChannel)
 from discord.ext import commands, tasks
 from discord.ext.commands import Cog, CommandNotFound, Greedy, command
 from discord.ext.menus import ListPageSource, MenuPages
