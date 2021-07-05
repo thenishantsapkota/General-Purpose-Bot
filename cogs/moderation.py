@@ -562,6 +562,7 @@ class Moderation(Cog):
     
 
     @role.group(name="admin")
+    @commands.has_permissions(administrator=True)
     async def adminroleset(self, ctx, role: Role):
         guild = ctx.guild
         author = ctx.author
@@ -579,6 +580,7 @@ class Moderation(Cog):
             await ctx.send(embed=embed)
 
     @role.group(name="mod")
+    @commands.has_permissions(administrator=True)
     async def modroleset(self, ctx, role: Role):
         guild = ctx.guild
         author = ctx.author
@@ -596,6 +598,7 @@ class Moderation(Cog):
             await ctx.send(embed=embed)
     
     @role.group(name="staff")
+    @commands.has_permissions(administrator=True)
     async def staffroleset(self, ctx, role: Role):
         guild = ctx.guild
         author = ctx.author
