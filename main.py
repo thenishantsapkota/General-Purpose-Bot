@@ -1,7 +1,7 @@
 import jishaku
 import watchgod
 from discord.ext import tasks
-from discord.ext.commands.bot import Bot
+from discord.ext.commands.bot import Bot, when_mentioned_or
 from tortoise import Tortoise
 
 from db.db_token import token
@@ -25,8 +25,8 @@ class CommandDisabled(commands.CommandError):
 
 async def get_prefix(client, message):
     data = await PrefixModel.get_or_none(guild_id=message.guild.id)
-    prefix_ = str(data.prefix)
-    return prefix_
+    prefix = str(data.prefix)
+    return when_mentioned_or(prefix)(client,message)
 
 
 client = commands.Bot(command_prefix=get_prefix, intents=intents)

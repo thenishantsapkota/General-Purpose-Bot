@@ -27,18 +27,17 @@ class Events(Cog):
                 activity=discord.Game(name="Visual Studio Code")
             )
 
-    @Cog.listener()
-    async def on_message(self, msg):
-        if self.client.user.mentioned_in(msg) and "prefix" in msg.content:
-            record = await PrefixModel.get_or_none(guild_id=msg.guild.id)
-            prefix = ">" if not record else record.prefix
-            embed = Embed(
-                title="Prefix",
-                description=f"The prefix for {msg.guild.name} is `{prefix}`.",
-                color=Color.blurple(),
-                timestamp=datetime.utcnow(),
-            )
-            await msg.channel.send(embed=embed)
+    @command(name="prefix")
+    async def on_message(self, ctx):
+        record = await PrefixModel.get_or_none(guild_id=ctx.guild.id)
+        prefix = ">" if not record else record.prefix
+        embed = Embed(
+            title="Prefix",
+            description=f"The prefix for {ctx.guild.name} is `{prefix}`.",
+            color=Color.blurple(),
+            timestamp=datetime.utcnow(),
+        )
+        await ctx.channel.send(embed=embed)
 
     @Cog.listener()
     async def on_guild_join(self, guild):

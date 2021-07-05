@@ -2,6 +2,8 @@ from datetime import date, timedelta
 from io import BytesIO
 from re import A
 from typing import Text
+from cogs.help import Help
+
 
 import pytz
 
@@ -37,6 +39,7 @@ class TimeConverter(commands.Converter):
 class Moderation(Cog):
     def __init__(self, client):
         self.client = client
+    
 
     @command(name="mute", aliases=["silence"], brief="Mute a member from the server.")
     # @commands.has_permissions(manage_messages=True)
@@ -103,12 +106,12 @@ class Moderation(Cog):
                         await member.edit(roles=[muted_role], reason="Muted the user.")
 
                     embed = Embed(
-                        description=f"**:mute: Muted {member.name} # {member.discriminator} [ID {member.id}]**",
+                        description=f"**:mute: Muted {member} [ID {member.id}]\nTime: {time}**",
                         color=Color.red(),
                         timestamp=datetime.utcnow(),
                     )
                     embed.set_author(
-                        name=f"{author.name} # {author.discriminator} [ID {author.id}]",
+                        name=f"{author} [ID {author.id}]",
                         icon_url=author.avatar_url,
                     )
                     embed.add_field(name="Reason", value=reason)
@@ -141,7 +144,8 @@ class Moderation(Cog):
         localized_mutetime = model.time
         localized_nowtime = utc.localize(datetime.now())
         if localized_mutetime > localized_nowtime:
-            remaining_time = (localized_mutetime - localized_nowtime).total_seconds()
+            remaining_time = (localized_mutetime -
+                              localized_nowtime).total_seconds()
             await asyncio.sleep(remaining_time)
             await self.mute_handler_get(model)
             # print("Success")
@@ -152,18 +156,20 @@ class Moderation(Cog):
     async def mute_handler_get(self, model: MuteModel):
         guild = self.client.get_guild(model.guild_id)
         member = guild.get_member(model.member_id)
-        logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
+        logChannel = discord.utils.get(
+            guild.text_channels, name="zorander-logs")
         role_ids = model.role_id
-        roles = [guild.get_role(int(id_)) for id_ in role_ids.split(",") if len(id_)]
+        roles = [guild.get_role(int(id_))
+                 for id_ in role_ids.split(",") if len(id_)]
         await member.edit(roles=roles)
         await model.delete()
         embed = Embed(
-            description=f"**:loud_sound: Unmuted {member.name} # {member.discriminator} [ID {member.id}]**",
+            description=f"**:loud_sound: Unmuted {member} [ID {member.id}]**",
             color=Color.green(),
             timestamp=datetime.utcnow(),
         )
         embed.set_author(
-            name=f"{self.client.user.name} # {self.client.user.discriminator} [ID {self.client.user.id}]",
+            name=f"{self.client.user} [ID {self.client.user.id}]",
             icon_url=self.client.user.avatar_url,
         )
         embed.add_field(name="Reason", value="Mute Duration Expired.")
@@ -228,12 +234,12 @@ class Moderation(Cog):
                 await model.delete()
                 await member.edit(roles=roles, reason="Unmuted the user.")
                 embed = Embed(
-                    description=f"**:loud_sound: Unmuted {member.name} # {member.discriminator} [ID {member.id}]**",
+                    description=f"**:loud_sound: Unmuted {member} [ID {member.id}]**",
                     color=Color.green(),
                     timestamp=datetime.utcnow(),
                 )
                 embed.set_author(
-                    name=f"{author.name} # {author.discriminator} [ID {author.id}]",
+                    name=f"{author} [ID {author.id}]",
                     icon_url=author.avatar_url,
                 )
                 embed.add_field(name="Reason", value=reason)
@@ -263,7 +269,8 @@ class Moderation(Cog):
             raise NotEnoughPermissions(
                 "You don't have either the roles required or the permissions."
             )
-        logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
+        logChannel = discord.utils.get(
+            guild.text_channels, name="zorander-logs")
         for member in members:
             if author.top_role > member.top_role:
                 if logChannel is None:
@@ -275,10 +282,10 @@ class Moderation(Cog):
                 embed = Embed(
                     color=Color.red(),
                     timestamp=datetime.utcnow(),
-                    description=f"**:boot: Kicked {member.name} # {member.discriminator} [ID {member.id}]**",
+                    description=f"**:boot: Kicked {member} [ID {member.id}]**",
                 )
                 embed.set_author(
-                    name=f"{author.name} # {author.discriminator} [ID {author.id}]",
+                    name=f"{author} [ID {author.id}]",
                     icon_url=author.avatar_url,
                 )
                 embed.add_field(name="Reason", value=reason)
@@ -309,7 +316,8 @@ class Moderation(Cog):
             raise NotEnoughPermissions(
                 "You don't have either the roles required or the permissions."
             )
-        logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
+        logChannel = discord.utils.get(
+            guild.text_channels, name="zorander-logs")
         for member in members:
             # if author.top_role > member.top_role:
             if logChannel is None:
@@ -321,10 +329,10 @@ class Moderation(Cog):
             embed = Embed(
                 color=Color.red(),
                 timestamp=datetime.utcnow(),
-                description=f"**:hammer: Banned {member.name} # {member.discriminator} [ID {member.id}]**",
+                description=f"**:hammer: Banned {member} [ID {member.id}]**",
             )
             embed.set_author(
-                name=f"{author.name} # {author.discriminator} [ID {author.id}]",
+                name=f"{author} [ID {author.id}]",
                 icon_url=author.avatar_url,
             )
             embed.add_field(name="Reason", value=reason)
@@ -354,7 +362,8 @@ class Moderation(Cog):
             raise NotEnoughPermissions(
                 "You don't have either the roles required or the permissions."
             )
-        logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
+        logChannel = discord.utils.get(
+            guild.text_channels, name="zorander-logs")
         if logChannel is None:
             logChannel = await guild.create_text_channel("zorander-logs")
             await logChannel.set_permissions(
@@ -364,10 +373,10 @@ class Moderation(Cog):
         embed = Embed(
             color=Color.green(),
             timestamp=datetime.utcnow(),
-            description=f"**:unlock: Unbanned {user.name} # {user.discriminator} [ID {user.id}]**",
+            description=f"**:unlock: Unbanned {user} [ID {user.id}]**",
         )
         embed.set_author(
-            name=f"{author.name} # {author.discriminator} [ID {author.id}]",
+            name=f"{author} [ID {author.id}]",
             icon_url=author.avatar_url,
         )
         embed.add_field(name="Reason", value=reason)
@@ -415,7 +424,8 @@ class Moderation(Cog):
                 "You don't have either the roles required or the permissions."
             )
         for member in members:
-            logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
+            logChannel = discord.utils.get(
+                guild.text_channels, name="zorander-logs")
             if author.top_role > member.top_role:
                 if logChannel is None:
                     logChannel = await guild.create_text_channel("zorander-logs")
@@ -435,10 +445,10 @@ class Moderation(Cog):
                     embed = Embed(
                         color=Color.red(),
                         timestamp=datetime.utcnow(),
-                        description=f"**:boot: Kicked {member.name} # {member.discriminator} [ID {member.id}]**",
+                        description=f"**:boot: Kicked {member} [ID {member.id}]**",
                     )
                     embed.set_author(
-                        name=f"{self.client.user.name} # {self.client.user.discriminator} [ID {self.client.user.id}]",
+                        name=f"{self.client.user} [ID {self.client.user.id}]",
                         icon_url=self.client.user.avatar_url,
                     )
                     embed.add_field(name="Reason", value="Too Many Warnings")
@@ -449,10 +459,10 @@ class Moderation(Cog):
                 embed = Embed(
                     color=Color.red(),
                     timestamp=datetime.utcnow(),
-                    description=f"**:warning: Warned {member.name} # {member.discriminator} [ID {member.id}]**",
+                    description=f"**:warning: Warned {member} [ID {member.id}]**",
                 )
                 embed.set_author(
-                    name=f"{author.name} # {author.discriminator} [ID {author.id}]",
+                    name=f"{author} [ID {author.id}]",
                     icon_url=author.avatar_url,
                 )
                 embed.add_field(name="Reason", value=reason)
@@ -465,12 +475,10 @@ class Moderation(Cog):
                     delete_after=10,
                 )
 
-    @command(name="warnings", brief="View warnings of the user.")
-    # @commands.has_permissions(manage_messages=True)
-    async def warnings_command(self, ctx, member: Optional[Member]):
-        """View warnings of the user."""
-        author = ctx.author
+    @commands.group(invoke_without_command=True)
+    async def warnings(self, ctx, member:Optional[Member]):
         guild = ctx.guild
+        author = ctx.author
         staffrole = (await self.fetchRoleData(guild)).get("staffrole")
         if not (
             await self.has_permissions(author, "manage_messages")
@@ -479,6 +487,7 @@ class Moderation(Cog):
             raise NotEnoughPermissions(
                 "You don't have either the roles required or the permissions."
             )
+        #await ctx.send(f"Use `delete` or `clear` as arguments to delete or clear warnings.")
         member = member or author
         warn_model = await WarnModel.filter(guild_id=guild.id, member_id=member.id)
 
@@ -491,13 +500,16 @@ class Moderation(Cog):
         embed = Embed(
             color=Color.blurple(),
             timestamp=datetime.utcnow(),
-            description=warnings if len(warn_model) else "User hasn't been warned.",
+            description=warnings if len(
+                warn_model) else "User hasn't been warned.",
         )
         embed.set_footer(text=f"Requested by {author.name}")
-        embed.set_author(name=f"Warnings of {member.name}", icon_url=member.avatar_url)
+        embed.set_author(
+            name=f"Warnings of {member.name}", icon_url=member.avatar_url)
         await ctx.send(embed=embed)
-
-    @command(name="delwarning", brief="Delete a warning of a user.")
+        
+    
+    @warnings.group(name="delete", brief="Delete a warning of a user.")
     # @commands.has_permissions(kick_members=True)
     async def delwarning_command(self, ctx, id: int):
         """Delete a warning of a user."""
@@ -515,7 +527,7 @@ class Moderation(Cog):
         await model.delete()
         await ctx.send("Done :ok_hand:")
 
-    @command(name="clw", brief="Clear the warnings of the member.")
+    @warnings.group(name="clear", brief="Clear the warnings of the member.")
     # @commands.has_permissions(administrator=True)
     async def clw_command(self, ctx, member: Member):
         """Clear the warnings of the member."""
@@ -523,7 +535,7 @@ class Moderation(Cog):
         guild = ctx.guild
         adminrole = (await self.fetchRoleData(guild)).get("adminrole")
         if not (
-            await self.has_permissions(author, "administrator")
+            await self.has_permissions(author, "kick_members")
             or await self.rolecheck(author, adminrole)
         ):
             raise NotEnoughPermissions(
@@ -537,10 +549,20 @@ class Moderation(Cog):
         )
         await ctx.send(embed=embed)
 
-    @command(name="adminroleset", brief="Set administrator role for the server.")
-    @commands.has_permissions(administrator=True)
-    async def adminroleset_command(self, ctx, role: Role):
-        """Set administrator role for the server."""
+    @commands.group(invoke_without_command=True)
+    async def role(self, ctx):
+        embed = Embed(
+            color = Color.blurple(),
+            timestamp = datetime.utcnow(),
+        )
+        embed.add_field(name=f"**Arguments**", value=f"`admin` - Set admin role for the server.\n\n`mod` - Set mod role for the server\n\n`staff` - Set staff role for the server.\n\n`give` - Give a role to the user.\nExample: `role give <member> <role>`\n\n`take` - Take a role from the user.\nExample: `role take <member> <role>`")
+        embed.set_author(name=f"Help with role command.", icon_url=self.client.user.avatar_url)
+        embed.set_footer(text=f"Invoked by {ctx.author}")
+        await ctx.send(embed=embed)
+    
+
+    @role.group(name="admin")
+    async def adminroleset(self, ctx, role: Role):
         guild = ctx.guild
         author = ctx.author
 
@@ -556,10 +578,8 @@ class Moderation(Cog):
             )
             await ctx.send(embed=embed)
 
-    @command(name="modroleset", brief="Set moderator role for the server.")
-    @commands.has_permissions(administrator=True)
-    async def modroleset_command(self, ctx, role: Role):
-        """Set moderator role for the server."""
+    @role.group(name="mod")
+    async def modroleset(self, ctx, role: Role):
         guild = ctx.guild
         author = ctx.author
 
@@ -574,11 +594,9 @@ class Moderation(Cog):
                 color=Color.blurple(),
             )
             await ctx.send(embed=embed)
-
-    @command(name="staffroleset", brief="Set staff role for the server.")
-    @commands.has_permissions(administrator=True)
-    async def staffroleset_command(self, ctx, role: Role):
-        """Set staff role for the server."""
+    
+    @role.group(name="staff")
+    async def staffroleset(self, ctx, role: Role):
         guild = ctx.guild
         author = ctx.author
 
@@ -593,14 +611,71 @@ class Moderation(Cog):
                 color=Color.blurple(),
             )
             await ctx.send(embed=embed)
+    
+    
+    @role.group(name="give", aliases=["add"], brief="Add a role to the user.")
+    # @commands.has_permissions(administrator=True)
+    async def giverole_command(self, ctx, member: Optional[Member], *, role: Role):
+        """Add a role to the user."""
+        author = ctx.author
+        guild = ctx.guild
+        adminrole = (await self.fetchRoleData(guild)).get("adminrole")
+        if not (
+            await self.has_permissions(author, "administrator")
+            or await self.rolecheck(author, adminrole)
+        ):
+            raise NotEnoughPermissions(
+                "You don't have either the roles required or the permissions."
+            )
+        member = member or ctx.author
+        if role in guild.roles:
+            await member.add_roles(role, reason=f"Invoked by {author}")
+            embed = Embed(
+                color=role.color,
+                timestamp=datetime.utcnow(),
+                description=f"**Role Added** \n {role.name}",
+            )
+            embed.set_author(
+                name=f"Updated roles for {member}", icon_url=member.avatar_url
+            )
+            embed.set_footer(text=f"Command Invoked by {author}")
+            await ctx.send(embed=embed)
 
-    @command(name="lockchannel", brief="Lock the channel provided")
-    # @commands.has_permissions(manage_channels=True)
-    async def lockchannel_command(self, ctx, channel: Optional[TextChannel]):
-        """Lock the channel provided"""
+    @role.group(
+        name="take", aliases=["remove"], brief="Remove a role from the user."
+    )
+    # @commands.has_permissions(administrator=True)
+    async def takerole_command(self, ctx, member: Optional[Member], *, role: Role):
+        """Remove a role from the user"""
+        author = ctx.author
+        guild = ctx.guild
+        adminrole = (await self.fetchRoleData(guild)).get("adminrole")
+        if not (
+            await self.has_permissions(author, "administrator")
+            or await self.rolecheck(author, adminrole)
+        ):
+            raise NotEnoughPermissions(
+                "You don't have either the roles required or the permissions."
+            )
+        member = member or ctx.author
+        if role in guild.roles:
+            await member.remove_roles(role, reason=f"Invoked by {author}")
+            embed = Embed(
+                color=role.color,
+                timestamp=datetime.utcnow(),
+                description=f"**Role Removed** \n {role.name}",
+            )
+            embed.set_author(
+                name=f"Updated roles for {member}", icon_url=member.avatar_url
+            )
+            embed.set_footer(text=f"Command Invoked by {author}")
+            await ctx.send(embed=embed)
+
+    @commands.group(invoke_without_command = True)
+    async def channel(self, ctx):
         guild = ctx.guild
         author = ctx.author
-        channel = channel or ctx.channel
+        #channel = channel or ctx.channel
         modrole = (await self.fetchRoleData(guild)).get("modrole")
         if not (
             await self.has_permissions(author, "manage_channels")
@@ -609,6 +684,22 @@ class Moderation(Cog):
             raise NotEnoughPermissions(
                 "You don't have either the roles required or the permissions."
             )
+        embed = Embed(
+            color = Color.blurple(),
+            timestamp = datetime.utcnow(),
+        )
+        embed.add_field(name=f"**Arguments**", value=f"`lock` - Lock a specific channel.\nExample: `channel lock #general(optional)`\n\n`unlock` - Unlock a specific channel.\nExample: `channel unlock #general(optional)`")
+        embed.set_author(name=f"Help with channel command.", icon_url=self.client.user.avatar_url)
+        embed.set_footer(text=f"Invoked by {ctx.author}")
+        await ctx.send(embed=embed)
+    
+
+    @channel.group(name="lock")
+    async def lockchannel_command(self, ctx, channel: Optional[TextChannel]):
+        """Lock the channel provided"""
+        guild = ctx.guild
+        author = ctx.author
+        channel = channel or ctx.channel
         model = await ModerationRoles.get_or_none(guild_id=guild.id)
         staff_role = discord.utils.get(
             guild.roles, id=(0 if model is None else model.staff_role)
@@ -630,22 +721,17 @@ class Moderation(Cog):
             color=Color.red(),
         )
         await ctx.send(embed=embed)
+    
+    
+    
 
-    @command(name="unlockchannel", brief="Unlock the channel provided.")
+    @channel.group(name="unlock", brief="Unlock the channel provided.")
     # @commands.has_permissions(manage_channels=True)
     async def unlockchannel_command(self, ctx, channel: Optional[TextChannel]):
         """Unlock the channel provided."""
         guild = ctx.guild
         channel = channel or ctx.channel
         author = ctx.author
-        modrole = (await self.fetchRoleData(guild)).get("modrole")
-        if not (
-            await self.has_permissions(author, "manage_channels")
-            or await self.rolecheck(author, modrole)
-        ):
-            raise NotEnoughPermissions(
-                "You don't have either the roles required or the permissions."
-            )
 
         model = await ModerationRoles.get_or_none(guild_id=guild.id)
         staff_role = discord.utils.get(
@@ -685,7 +771,14 @@ class Moderation(Cog):
             raise NotEnoughPermissions(
                 "You don't have either the roles required or the permissions."
             )
-        await ctx.send("Please use `start` or `end` as arguments.", delete_after=10)
+        embed = Embed(
+            color = Color.blurple(),
+            timestamp = datetime.utcnow(),
+        )
+        embed.add_field(name=f"**Arguments**", value=f"`start` - Start the server lockdown.\n\n`end` - End the server lockdown.")
+        embed.set_author(name=f"Help with lockdown command.", icon_url=self.client.user.avatar_url)
+        embed.set_footer(text=f"Invoked by {ctx.author}")
+        await ctx.send(embed=embed)
 
     @lockdown_command.command(name="start")
     async def startlockdown(self, ctx):
@@ -736,63 +829,6 @@ class Moderation(Cog):
         perms_staff = staff_role.permissions
         return (perms_default, perms_staff, staff_role)
 
-    @command(name="giverole", aliases=["addrole"], brief="Add a role to the user.")
-    # @commands.has_permissions(administrator=True)
-    async def giverole_command(self, ctx, member: Optional[Member], *, role: Role):
-        """Add a role to the user."""
-        author = ctx.author
-        guild = ctx.guild
-        adminrole = (await self.fetchRoleData(guild)).get("adminrole")
-        if not (
-            await self.has_permissions(author, "administrator")
-            or await self.rolecheck(author, adminrole)
-        ):
-            raise NotEnoughPermissions(
-                "You don't have either the roles required or the permissions."
-            )
-        member = member or ctx.author
-        if role in guild.roles:
-            await member.add_roles(role, reason=f"Invoked by {author}")
-            embed = Embed(
-                color=role.color,
-                timestamp=datetime.utcnow(),
-                description=f"**Role Added** \n {role.name}",
-            )
-            embed.set_author(
-                name=f"Updated roles for {member}", icon_url=member.avatar_url
-            )
-            embed.set_footer(text=f"Command Invoked by {author}")
-            await ctx.send(embed=embed)
-
-    @command(
-        name="takerole", aliases=["removerole"], brief="Remove a role from the user."
-    )
-    # @commands.has_permissions(administrator=True)
-    async def takerole_command(self, ctx, member: Optional[Member], *, role: Role):
-        """Remove a role from the user"""
-        author = ctx.author
-        guild = ctx.guild
-        adminrole = (await self.fetchRoleData(guild)).get("adminrole")
-        if not (
-            await self.has_permissions(author, "administrator")
-            or await self.rolecheck(author, adminrole)
-        ):
-            raise NotEnoughPermissions(
-                "You don't have either the roles required or the permissions."
-            )
-        member = member or ctx.author
-        if role in guild.roles:
-            await member.remove_roles(role, reason=f"Invoked by {author}")
-            embed = Embed(
-                color=role.color,
-                timestamp=datetime.utcnow(),
-                description=f"**Role Removed** \n {role.name}",
-            )
-            embed.set_author(
-                name=f"Updated roles for {member}", icon_url=member.avatar_url
-            )
-            embed.set_footer(text=f"Command Invoked by {author}")
-            await ctx.send(embed=embed)
 
     @command(name="slowmode", brief="Add slowmode to the channel you invoke it in.")
     # @commands.has_permissions(manage_channels=True)
@@ -844,7 +880,19 @@ class Moderation(Cog):
         embed.set_footer(text=f"Invoked by {author}")
         await ctx.send(embed=embed)
 
-    @command(aliases=["addem"], brief="Add an emote to the server.")
+    #emoji section start
+    @commands.group(invoke_without_command=True)
+    async def emoji(self, ctx):
+        embed = Embed(
+            color = Color.blurple(),
+            timestamp = datetime.utcnow(),
+        )
+        embed.add_field(name=f"**Arguments**", value=f"`create` - Create an emoji from a emoji url.\nExample: `emoji create <url> <name>`\n\n`rename` - Rename an emoji from the server.\nExample : `emoji rename <emoji> <new_name>`\n\n`delete` - Delete an emoji from the server.\nExample : `emoji delete <emoji>`")
+        embed.set_author(name=f"Help with emoji command.", icon_url=self.client.user.avatar_url)
+        embed.set_footer(text=f"Invoked by {ctx.author}")
+        await ctx.send(embed=embed)
+    
+    @emoji.group(name="create", aliases=["addem"], brief="Add an emote to the server.")
     @commands.has_permissions(manage_emojis=True)
     async def createemoji(self, ctx, url: str, *, name):
         """Add an emote to the server using the url of the emote."""
@@ -858,26 +906,27 @@ class Moderation(Cog):
                             image=bytes, name=name
                         )
                         await ctx.send(
-                            f"Emote sucessfully created | <:{emoji.name}:{emoji.id}>"
+                            f"Emote sucessfully created | {emoji}"
                         )
                     else:
                         await ctx.send(f"Error making request | Response: {r.status}")
                 except discord.HTTPException:
                     await ctx.send("File size may be too big.")
 
-    @command(aliases=["renameem"], brief="Rename the emoji of the server.")
+    @emoji.group(name="rename", aliases=["renameem"], brief="Rename the emoji of the server.")
     @commands.has_permissions(manage_emojis=True)
     async def renameemoji(self, ctx, emoji: discord.Emoji, *, name):
         """Rename the emoji of the server."""
         await ctx.send(f"{emoji} | Emote name changed to `{name}`")
         await emoji.edit(name=name, reason="Emoji Name Edit")
 
-    @command(aliases=["delem"], brief="Delete an emoji from the server.")
+    @emoji.group(name="delete", aliases=["delem"], brief="Delete an emoji from the server.")
     @commands.has_permissions(manage_emojis=True)
     async def deleteemoji(self, ctx, emoji: discord.Emoji):
         """Delete an emoji from the server."""
         await ctx.send(f"{emoji} | Emote deleted sucessfully.")
         await emoji.delete()
+    #emoji section end
 
     @command(
         name="changeprefix",
@@ -885,8 +934,9 @@ class Moderation(Cog):
         brief="Changes the prefix of the bot in the server.",
     )
     @commands.has_permissions(administrator=True)
-    async def changeprefix_command(self, ctx, prefix: str):
+    async def changeprefix_command(self, ctx, prefix: Optional[str]):
         """Changes the prefix of the bot in the server."""
+        prefix = prefix or ">"
         model = await PrefixModel.get_or_none(guild_id=ctx.guild.id)
         model.prefix = prefix
         await model.save()
