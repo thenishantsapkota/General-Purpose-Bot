@@ -105,6 +105,14 @@ class Tickets(Cog):
 
                 else:
                     await ticket_channel.delete()
+    @command(name="delticketconfig")
+    async def delticketconfig_command(self, ctx):
+        model = await TicketModel.get_or_none(guild_id = ctx.guild.id)
+        if model is None:
+            await ctx.send("No data found in the database.")
+            return
+        await model.delete()
+        await ctx.send("Configuration for ticket deleted successfully for this server.", delete_after = 10)
             
 
 
