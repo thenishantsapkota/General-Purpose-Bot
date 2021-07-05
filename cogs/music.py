@@ -246,11 +246,11 @@ class Player(wavelink.Player):
     async def start_playback(self):
         await self.play(self.queue.current_track)
 
-    async def advance(self):
+    async def advance(self):#remove ctx if breaks
         try:
             if (track := self.queue.get_next_track()) is not None:
                 await self.play(track)
-                music = self.bot.get_channel(834792408659001344)
+                #music = self.bot.get_channel(834792408659001344)
                 embed = discord.Embed(
                     title="Now Playing",
                     description=getattr(
@@ -262,21 +262,21 @@ class Player(wavelink.Player):
                     # color = 0x00ff00
                 )
                 # embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
-                await music.send(embed=embed)
+                #await ctx.send(embed=embed)
 
         except QueueIsEmpty:
             pass
 
-    async def repeat_track(self):
+    async def repeat_track(self, ctx):
         await self.play(self.queue.current_track)
-        music = self.bot.get_channel(834792408659001344)
+        #music = self.bot.get_channel(834792408659001344)
         embed = discord.Embed(
             title="Repeat",
             description=f"Looping the current track!",
             timestamp=dt.datetime.utcnow(),
         )
-        # embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
-        await music.send(embed=embed)
+        embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=embed)
 
 
 class Music(commands.Cog, wavelink.WavelinkMixin):
@@ -302,7 +302,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         if payload.player.queue.repeat_mode == RepeatMode.ONE:
             await payload.player.repeat_track()
         else:
-            await payload.player.advance()
+            await payload.player.advance()#remove ctx if breaks
 
     async def cog_check(self, ctx):
         if isinstance(ctx.channel, discord.DMChannel):

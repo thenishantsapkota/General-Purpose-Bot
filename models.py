@@ -88,3 +88,14 @@ class ModerationRoles(Model):
     class Meta:
         table = "staffroles"
         table_description = "Stores StaffRoles of the server"
+
+class TicketModel(Model):
+    id = fields.IntField(pk=True)
+    category_id = fields.BigIntField()
+    message_id = fields.BigIntField()
+    message_channel_id = fields.BigIntField()
+    guild_id = fields.BigIntField()
+
+    class Meta:
+        table = "tickets"
+        table_description = "Stores info about tickets"

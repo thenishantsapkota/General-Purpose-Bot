@@ -26,7 +26,7 @@ class Events(Cog):
     async def on_message(self, msg):
         if self.client.user.mentioned_in(msg) and "prefix" in msg.content:
             record = await PrefixModel.get_or_none(guild_id=msg.guild.id)
-            prefix = ">" if not record.prefix else record.prefix
+            prefix = ">" if not record else record.prefix
             embed = Embed(
                 title="Prefix",
                 description=f"The prefix for {msg.guild.name} is `{prefix}`.",
