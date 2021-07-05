@@ -251,18 +251,6 @@ class Player(wavelink.Player):
             if (track := self.queue.get_next_track()) is not None:
                 await self.play(track)
                 #music = self.bot.get_channel(834792408659001344)
-                embed = discord.Embed(
-                    title="Now Playing",
-                    description=getattr(
-                        self.queue.current_track,
-                        "title",
-                        "No tracks currently playing.",
-                    ),
-                    timestamp=dt.datetime.utcnow()
-                    # color = 0x00ff00
-                )
-                # embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
-                #await ctx.send(embed=embed)
 
         except QueueIsEmpty:
             pass
@@ -321,7 +309,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
                 "rest_uri": "http://127.0.0.1:2333",
                 "password": "youshallnotpass",
                 "identifier": "MAIN",
-                "region": "europe",
+                "region": "india",
             }
         }
 
