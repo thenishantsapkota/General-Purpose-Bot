@@ -25,7 +25,7 @@ class Tickets(Cog):
 
     async def fetchRoleData(self, guild: discord.Guild):
         model = await ModerationRoles.get_or_none(guild_id=guild.id)
-        if not model:
+        if model is None:
             return False
         adminrole = discord.utils.get(guild.roles, id=model.admin_role)
         modrole = discord.utils.get(guild.roles, id=model.mod_role)
