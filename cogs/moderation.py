@@ -106,7 +106,7 @@ class Moderation(Cog):
                         await member.edit(roles=[muted_role], reason="Muted the user.")
 
                     embed = Embed(
-                        description=f"**:mute: Muted {member} [ID {member.id}]\nTime: {time}**",
+                        description=f"**:mute: Muted {member} [ID {member.id}]\nTime: {time}s**",
                         color=Color.red(),
                         timestamp=datetime.utcnow(),
                     )
