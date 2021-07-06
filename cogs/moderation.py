@@ -674,6 +674,14 @@ class Moderation(Cog):
         guild = ctx.guild
         author = ctx.author
         channel = channel or ctx.channel
+        modrole = (await fetchRoleData(guild)).get("modrole")
+        if not (
+            await has_permissions(author, "manage_channels")
+            or await rolecheck(author, modrole)
+        ):
+            raise NotEnoughPermissions(
+                "You don't have either the roles required or the permissions."
+            )
         model = await ModerationRoles.get_or_none(guild_id=guild.id)
         staff_role = discord.utils.get(
             guild.roles, id=(0 if model is None else model.staff_role)
@@ -703,6 +711,14 @@ class Moderation(Cog):
         guild = ctx.guild
         channel = channel or ctx.channel
         author = ctx.author
+        modrole = (await fetchRoleData(guild)).get("modrole")
+        if not (
+            await has_permissions(author, "manage_channels")
+            or await rolecheck(author, modrole)
+        ):
+            raise NotEnoughPermissions(
+                "You don't have either the roles required or the permissions."
+            )
 
         model = await ModerationRoles.get_or_none(guild_id=guild.id)
         staff_role = discord.utils.get(
