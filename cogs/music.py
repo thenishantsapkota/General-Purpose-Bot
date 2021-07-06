@@ -246,24 +246,27 @@ class Player(wavelink.Player):
     async def start_playback(self):
         await self.play(self.queue.current_track)
 
-    async def advance(self):#remove ctx if breaks
+    async def advance(self):  # remove ctx if breaks
         try:
             if (track := self.queue.get_next_track()) is not None:
                 await self.play(track)
-                #music = self.bot.get_channel(834792408659001344)
+                # music = self.bot.get_channel(834792408659001344)
 
         except QueueIsEmpty:
             pass
 
     async def repeat_track(self, ctx):
         await self.play(self.queue.current_track)
-        #music = self.bot.get_channel(834792408659001344)
+        # music = self.bot.get_channel(834792408659001344)
         embed = discord.Embed(
             title="Repeat",
             description=f"Looping the current track!",
             timestamp=dt.datetime.utcnow(),
         )
-        embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
+        embed.set_footer(
+            text=f"Requested by {ctx.author.display_name}",
+            icon_url=ctx.author.avatar_url,
+        )
         await ctx.send(embed=embed)
 
 
@@ -290,7 +293,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         if payload.player.queue.repeat_mode == RepeatMode.ONE:
             await payload.player.repeat_track()
         else:
-            await payload.player.advance()#remove ctx if breaks
+            await payload.player.advance()  # remove ctx if breaks
 
     async def cog_check(self, ctx):
         if isinstance(ctx.channel, discord.DMChannel):
@@ -410,10 +413,10 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         await player.stop()
         # await ctx.send("Playing next track in queue.")
-        embed = discord.Embed(
-            color=ctx.author.color
+        embed = discord.Embed(color=ctx.author.color)
+        embed.set_author(
+            name="Playing next track in the queue!", icon_url=ctx.author.avatar_url
         )
-        embed.set_author(name="Playing next track in the queue!", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 
     @next_command.error
@@ -435,10 +438,10 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         player.queue.position -= 2
         await player.stop()
-        embed = discord.Embed(
-            color=ctx.author.color
+        embed = discord.Embed(color=ctx.author.color)
+        embed.set_author(
+            name="Playing previous track in the queue!", icon_url=ctx.author.avatar_url
         )
-        embed.set_author(name="Playing previous track in the queue!", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 
     @previous_command.error
@@ -456,9 +459,11 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player = self.get_player(ctx)
         player.queue.shuffle()
         embed = discord.Embed(
-            color = ctx.author.color,
+            color=ctx.author.color,
         )
-        embed.set_author(name="Queue has been shuffled.", icon_url=ctx.author.avatar_url)
+        embed.set_author(
+            name="Queue has been shuffled.", icon_url=ctx.author.avatar_url
+        )
         await ctx.send(embed=embed)
 
     @shuffle_command.error
@@ -475,17 +480,13 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             embed = discord.Embed(
                 color=ctx.author.color,
             )
-            embed.set_footer(
-                text=f"Invoked by {ctx.author}"
-            )
+            embed.set_footer(text=f"Invoked by {ctx.author}")
             embed.set_author(name=f"Looping the current song!")
             await ctx.send(embed=embed)
 
         player.queue.set_repeat_mode(mode)
         # await ctx.send(f"The repeat mode has been set to {mode}.")
-        embed = discord.Embed(
-            color=ctx.author.color
-        )
+        embed = discord.Embed(color=ctx.author.color)
         embed.set_author(name=f"The repeat mode has been set to {mode}")
         embed.set_footer(text=f"Invoked by {ctx.author}")
         await ctx.send(embed=embed)
@@ -517,7 +518,9 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         if upcoming := player.queue.upcoming:
             embed.add_field(
                 name="Next up",
-                value=f"\n".join(f"**{i+1}.** {t.title}" for (i,t) in enumerate(upcoming[:show])),
+                value=f"\n".join(
+                    f"**{i+1}.** {t.title}" for (i, t) in enumerate(upcoming[:show])
+                ),
                 inline=False,
             )
 
@@ -559,10 +562,10 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player.queue.empty()
         await player.stop()
         # await ctx.send("Playback stopped.")
-        embed = discord.Embed(
-            color=ctx.author.color
+        embed = discord.Embed(color=ctx.author.color)
+        embed.set_author(
+            name="Queue has been cleared successfully.", icon_url=ctx.author.avatar_url
         )
-        embed.set_author(name="Queue has been cleared successfully.", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 
     @clear_command.error

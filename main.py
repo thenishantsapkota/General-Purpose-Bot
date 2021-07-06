@@ -26,7 +26,7 @@ class CommandDisabled(commands.CommandError):
 async def get_prefix(client, message):
     data = await PrefixModel.get_or_none(guild_id=message.guild.id)
     prefix = str(data.prefix)
-    return when_mentioned_or(prefix)(client,message)
+    return when_mentioned_or(prefix)(client, message)
 
 
 client = commands.Bot(command_prefix=get_prefix, intents=intents)

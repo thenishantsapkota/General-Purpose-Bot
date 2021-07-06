@@ -89,6 +89,7 @@ class ModerationRoles(Model):
         table = "staffroles"
         table_description = "Stores StaffRoles of the server"
 
+
 class TicketModel(Model):
     id = fields.IntField(pk=True)
     category_id = fields.BigIntField()

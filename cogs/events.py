@@ -8,7 +8,6 @@ from models import OnMemberJoinModel, PrefixModel
 from modules.imports import *
 
 
-
 class Events(Cog):
     """
     Cog to handle Events of the bot
@@ -49,12 +48,14 @@ class Events(Cog):
             base_role_id=0,
         )
         embed = Embed(
-            color = Color.blurple(),
-            timestamp = datetime.utcnow(),
-            description = "**Thanks for adding me.:smile:\n\nBefore using the moderation commands, please set the Admin, Moderator, Staff Role using `adminroleset`, `modroleset`, `staffroleset` resepctively\n\nThe default prefix for this guild is > and if you wish to change it just run `chp <desired_prefix>` to change the prefix.\n\nGreetings :heart:**"
+            color=Color.blurple(),
+            timestamp=datetime.utcnow(),
+            description="**Thanks for adding me.:smile:\n\nBefore using the moderation commands, please set the Admin, Moderator, Staff Role using `adminroleset`, `modroleset`, `staffroleset` resepctively\n\nThe default prefix for this guild is > and if you wish to change it just run `chp <desired_prefix>` to change the prefix.\n\nGreetings :heart:**",
         )
         embed.set_author(name=f"{self.client.user} has joined {guild.name}")
-        bot_entry = await guild.audit_logs(action=discord.AuditLogAction.bot_add).flatten()
+        bot_entry = await guild.audit_logs(
+            action=discord.AuditLogAction.bot_add
+        ).flatten()
         await bot_entry[0].user.send(embed=embed)
         await welcome.save()
         await record.save()
