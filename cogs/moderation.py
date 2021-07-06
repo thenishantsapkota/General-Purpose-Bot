@@ -621,8 +621,8 @@ class Moderation(Cog):
         guild = ctx.guild
         adminrole = (await fetchRoleData(guild)).get("adminrole")
         if not (
-            await self.has_permissions(author, "administrator")
-            or await self.rolecheck(author, adminrole)
+            await has_permissions(author, "administrator")
+            or await rolecheck(author, adminrole)
         ):
             raise NotEnoughPermissions(
                 "You don't have either the roles required or the permissions."
