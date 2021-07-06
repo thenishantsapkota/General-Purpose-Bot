@@ -420,6 +420,12 @@ class Misc(Cog):
     async def on_remainder(self, channel_id, author_id, reason):
         channel = self.client.get_channel(channel_id)
         await channel.send(f" <@{author_id}>, Remainder: {reason}")
+    
+
+    @command(name="serverinvite")
+    async def serverinvite_command(self, ctx):
+        link = await ctx.channel.create_invite(max_age=0)
+        await ctx.send(f"**The invite link for this server is**\n{link}")
 
 
 def setup(client):
