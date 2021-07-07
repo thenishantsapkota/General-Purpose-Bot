@@ -97,14 +97,14 @@ class Fun(Cog):
         embed.set_image(url=hug_url)
         await ctx.send(embed=embed)
 
-    @commands.cooldown(3, 21600, commands.BucketType.user)
-    @command(name="spamping")
-    async def spamping_command(self, ctx, member: Member, times: Optional[int]):
-        times = times or 20
-        await ctx.message.delete()
-        for _ in range(times):
-            m = await ctx.send(member.mention)
-            await m.delete()
+    # @commands.cooldown(3, 21600, commands.BucketType.user)
+    # @command(name="spamping")
+    # async def spamping_command(self, ctx, member: Member, times: Optional[int]):
+    #     times = times or 20
+    #     await ctx.message.delete()
+    #     for _ in range(times):
+    #         m = await ctx.send(member.mention)
+    #         await m.delete()
 
 
 def setup(client):
