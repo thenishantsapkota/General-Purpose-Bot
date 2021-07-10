@@ -946,6 +946,11 @@ class Moderation(Cog):
             timestamp=datetime.utcnow(),
         )
         await ctx.send(embed=embed)
+    
+
+    # @command(name=modmenu)
+    # async def modmenu_command(self, ctx, member:Member):
+    #     pass
 
 
 def setup(client):

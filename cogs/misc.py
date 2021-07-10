@@ -3,6 +3,7 @@ from datetime import date
 from io import BytesIO
 from logging import log
 from pathlib import Path
+from nepali_date import NepaliDate
 
 import aiohttp
 from discord.ext import timers
@@ -72,7 +73,8 @@ class Misc(Cog):
         textChannels = len(ctx.guild.text_channels)
         voiceChannels = len(ctx.guild.voice_channels)
         roles = len(ctx.guild.roles)
-        guildCreatedate = ctx.guild.created_at.strftime("%a, %#d %B %Y, %I:%M %p")
+        guildCreatedate = ctx.guild.created_at.strftime(
+            "%a, %#d %B %Y, %I:%M %p")
 
         embed = Embed(
             title=f"Info of {ctx.guild.name} Server",
@@ -103,7 +105,8 @@ class Misc(Cog):
         id = member.id
         name = member.name
         accountAge = member.created_at.strftime("%a, %#d %B %Y, %I:%M %p UTC")
-        joinServerDate = member.joined_at.strftime("%a, %#d %B %Y, %I:%M %p UTC")
+        joinServerDate = member.joined_at.strftime(
+            "%a, %#d %B %Y, %I:%M %p UTC")
         highestRole = member.top_role.mention
 
         info = "Server Owner" if ctx.guild.owner is ctx.author else "Member"
@@ -203,7 +206,8 @@ class Misc(Cog):
                 f"**Name** - {name}\n**Blog URL** - {None if not blog else blog}\n**Location** - {location}\n**Twitter Username** - {twitter_username}\n **Public Repositories** - {publicrepos}\n**Followers** - {followers}\n**Following** - {following}"
             ),
         )
-        embed.set_author(name=f"Github Profile info of username {githubusername}")
+        embed.set_author(
+            name=f"Github Profile info of username {githubusername}")
         if avatar_url is not None:
             embed.set_thumbnail(url=avatar_url)
         await ctx.send(embed=embed)
@@ -343,7 +347,8 @@ class Misc(Cog):
             name=f"Your code was in  {str(result['language']).capitalize()}.",
             icon_url=ctx.author.avatar_url,
         )
-        embed.add_field(name="Output", value=f"`{output}`" or "**<No output>**")
+        embed.add_field(
+            name="Output", value=f"`{output}`" or "**<No output>**")
         embed.set_footer(text=f"Requested by {ctx.author.name}")
         await ctx.message.add_reaction("<a:loading:856179279292006430>")
         await asyncio.sleep(2)
@@ -420,7 +425,13 @@ class Misc(Cog):
     async def on_remainder(self, channel_id, author_id, reason):
         channel = self.client.get_channel(channel_id)
         await channel.send(f" <@{author_id}>, Remainder: {reason}")
-    
+
+    @command(name="nepalidate")
+    async def nepalidate_command(self, ctx):
+        nepdate = NepaliDate.today()
+        nepdate_dev = NepaliDate.today(lang="nep")
+        await ctx.send(nepdate)
+        await ctx.send(nepdate_dev)
 
     @command(name="serverinvite")
     async def serverinvite_command(self, ctx):
