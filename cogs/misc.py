@@ -73,8 +73,7 @@ class Misc(Cog):
         textChannels = len(ctx.guild.text_channels)
         voiceChannels = len(ctx.guild.voice_channels)
         roles = len(ctx.guild.roles)
-        guildCreatedate = ctx.guild.created_at.strftime(
-            "%a, %#d %B %Y, %I:%M %p")
+        guildCreatedate = ctx.guild.created_at.strftime("%a, %#d %B %Y, %I:%M %p")
 
         embed = Embed(
             title=f"Info of {ctx.guild.name} Server",
@@ -105,8 +104,7 @@ class Misc(Cog):
         id = member.id
         name = member.name
         accountAge = member.created_at.strftime("%a, %#d %B %Y, %I:%M %p UTC")
-        joinServerDate = member.joined_at.strftime(
-            "%a, %#d %B %Y, %I:%M %p UTC")
+        joinServerDate = member.joined_at.strftime("%a, %#d %B %Y, %I:%M %p UTC")
         highestRole = member.top_role.mention
 
         info = "Server Owner" if ctx.guild.owner is ctx.author else "Member"
@@ -206,8 +204,7 @@ class Misc(Cog):
                 f"**Name** - {name}\n**Blog URL** - {None if not blog else blog}\n**Location** - {location}\n**Twitter Username** - {twitter_username}\n **Public Repositories** - {publicrepos}\n**Followers** - {followers}\n**Following** - {following}"
             ),
         )
-        embed.set_author(
-            name=f"Github Profile info of username {githubusername}")
+        embed.set_author(name=f"Github Profile info of username {githubusername}")
         if avatar_url is not None:
             embed.set_thumbnail(url=avatar_url)
         await ctx.send(embed=embed)
@@ -273,25 +270,26 @@ class Misc(Cog):
     @command(name="c19", brief="Show the COVID-19 stats of the country provided.")
     async def c19_command(self, ctx, *, country: Optional[str]):
         """Show the COVID-19 stats of the country provided."""
-        country = country or "nepal"
-        logoUrl = "http://covidcp.org/images/logo-icononly.png"
-        url = f"https://coronavirus-19-api.herokuapp.com/countries/{country}"
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                data = await resp.json()
-                cntry = data["country"]
-                cases = data["cases"]
-                todayCases = data["todayCases"]
-                deaths = data["deaths"]
-                recovered = data["recovered"]
-                active = data["active"]
-        output = f"Total Cases - **{cases}** \n Cases Today - **{todayCases}** \nTotal Deaths - **{deaths}** \nActive Cases - **{active}** \nTotal Recovered - **{recovered}**"
-        embed = Embed(
-            color=Color.blurple(), timestamp=datetime.utcnow(), description=output
-        )
-        embed.set_author(name=f"COVID-19 Stats for {cntry}")
-        embed.set_thumbnail(url=logoUrl)
-        await ctx.send(embed=embed)
+        with ctx.channel.typing():
+            country = country or "nepal"
+            logoUrl = "http://covidcp.org/images/logo-icononly.png"
+            url = f"https://coronavirus-19-api.herokuapp.com/countries/{country}"
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as resp:
+                    data = await resp.json()
+                    cntry = data["country"]
+                    cases = data["cases"]
+                    todayCases = data["todayCases"]
+                    deaths = data["deaths"]
+                    recovered = data["recovered"]
+                    active = data["active"]
+            output = f"Total Cases - **{cases}** \n Cases Today - **{todayCases}** \nTotal Deaths - **{deaths}** \nActive Cases - **{active}** \nTotal Recovered - **{recovered}**"
+            embed = Embed(
+                color=Color.blurple(), timestamp=datetime.utcnow(), description=output
+            )
+            embed.set_author(name=f"COVID-19 Stats for {cntry}")
+            embed.set_thumbnail(url=logoUrl)
+            await ctx.send(embed=embed)
 
     def __init__(self, client):
         self.client = client
@@ -347,8 +345,7 @@ class Misc(Cog):
             name=f"Your code was in  {str(result['language']).capitalize()}.",
             icon_url=ctx.author.avatar_url,
         )
-        embed.add_field(
-            name="Output", value=f"`{output}`" or "**<No output>**")
+        embed.add_field(name="Output", value=f"`{output}`" or "**<No output>**")
         embed.set_footer(text=f"Requested by {ctx.author.name}")
         await ctx.message.add_reaction("<a:loading:856179279292006430>")
         await asyncio.sleep(2)
@@ -428,15 +425,18 @@ class Misc(Cog):
 
     @command(name="nepalidate")
     async def nepalidate_command(self, ctx):
-        nepdate = NepaliDate.today()
-        nepdate_dev = NepaliDate.today(lang="nep")
-        await ctx.send(nepdate)
-        await ctx.send(nepdate_dev)
+        with ctx.channel.typing():
+            nepdate = NepaliDate.today()
+
+            nepdate_dev = NepaliDate.today(lang="nep")
+            await ctx.send(nepdate)
+            await ctx.send(nepdate_dev)
 
     @command(name="serverinvite")
     async def serverinvite_command(self, ctx):
-        link = await ctx.channel.create_invite(max_age=0)
-        await ctx.send(f"**The invite link for this server is**\n{link}")
+        with ctx.channel.typing():
+            link = await ctx.channel.create_invite(max_age=0)
+            await ctx.send(f"**The invite link for this server is**\n{link}")
 
 
 def setup(client):

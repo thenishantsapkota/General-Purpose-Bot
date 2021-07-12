@@ -11,6 +11,8 @@ from models import ModerationRoles, MuteModel, PrefixModel, WarnModel
 from modules.imports import *
 from modules.permissions import *
 
+emojis = ["🔨", "👢", "🔇", "🔊", "❌"]
+
 
 class NotEnoughPermissions(commands.CommandError):
     pass
@@ -247,7 +249,7 @@ class Moderation(Cog):
                 pass
 
     @command(name="kick", brief="Kick the member from the server.")
-    #@commands.has_permissions(kick_members=True)
+    # @commands.has_permissions(kick_members=True)
     async def kick_command(
         self,
         ctx,
@@ -946,11 +948,23 @@ class Moderation(Cog):
             timestamp=datetime.utcnow(),
         )
         await ctx.send(embed=embed)
-    
 
-    # @command(name=modmenu)
+    # @command(name="modmenu")
     # async def modmenu_command(self, ctx, member:Member):
-    #     pass
+    #     embed = Embed(
+    #         color = Color.blurple(),
+    #         description = f":hammer: - **Ban**\n:boot: - **Kick**\n:mute: - **Mute**\n:loud_sound: - **Unmute**\n:x: - **Close Menu**"
+    #     )
+    #     embed.set_author(name=f"{member} - Mod Menu")
+    #     msg = await ctx.send(embed=embed)
+
+    #     for i in range(len(emojis)):
+    #         await msg.add_reaction(emojis[i])
+
+    # @Cog.listener()
+    # async def on_raw_reaction_add(self, payload):
+    #     if (payload.member.id != self.client.user.id and str(payload.emoji) in emojis):
+    #         print(payload.message_id)
 
 
 def setup(client):
