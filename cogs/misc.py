@@ -438,6 +438,7 @@ class Misc(Cog):
             link = await ctx.channel.create_invite(max_age=0)
             await ctx.send(f"**The invite link for this server is**\n{link}")
             #yes
+            #no
 
 
 def setup(client):
