@@ -146,7 +146,8 @@ class Moderation(Cog):
         localized_mutetime = model.time
         localized_nowtime = utc.localize(datetime.now())
         if localized_mutetime > localized_nowtime:
-            remaining_time = (localized_mutetime - localized_nowtime).total_seconds()
+            remaining_time = (localized_mutetime -
+                              localized_nowtime).total_seconds()
             await asyncio.sleep(remaining_time)
             await self.mute_handler_get(model)
             # print("Success")
@@ -157,9 +158,11 @@ class Moderation(Cog):
     async def mute_handler_get(self, model: MuteModel):
         guild = self.client.get_guild(model.guild_id)
         member = guild.get_member(model.member_id)
-        logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
+        logChannel = discord.utils.get(
+            guild.text_channels, name="zorander-logs")
         role_ids = model.role_id
-        roles = [guild.get_role(int(id_)) for id_ in role_ids.split(",") if len(id_)]
+        roles = [guild.get_role(int(id_))
+                 for id_ in role_ids.split(",") if len(id_)]
         await member.edit(roles=roles)
         await model.delete()
         embed = Embed(
@@ -223,7 +226,7 @@ class Moderation(Cog):
                     await logChannel.set_permissions(
                         guild.default_role, view_channel=False, send_messages=False
                     )
-                model = await MuteModel.get_or_none(
+                model = await MuteModel.get(
                     guild_id=guild.id, member_id=member.id
                 )
                 role_ids = model.role_id
@@ -268,7 +271,8 @@ class Moderation(Cog):
             raise NotEnoughPermissions(
                 "You don't have either the roles required or the permissions."
             )
-        logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
+        logChannel = discord.utils.get(
+            guild.text_channels, name="zorander-logs")
         for member in members:
             if author.top_role > member.top_role:
                 if logChannel is None:
@@ -314,7 +318,8 @@ class Moderation(Cog):
             raise NotEnoughPermissions(
                 "You don't have either the roles required or the permissions."
             )
-        logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
+        logChannel = discord.utils.get(
+            guild.text_channels, name="zorander-logs")
         for member in members:
             # if author.top_role > member.top_role:
             if logChannel is None:
@@ -359,7 +364,8 @@ class Moderation(Cog):
             raise NotEnoughPermissions(
                 "You don't have either the roles required or the permissions."
             )
-        logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
+        logChannel = discord.utils.get(
+            guild.text_channels, name="zorander-logs")
         if logChannel is None:
             logChannel = await guild.create_text_channel("zorander-logs")
             await logChannel.set_permissions(
@@ -396,7 +402,8 @@ class Moderation(Cog):
                 "You don't have either the roles required or the permissions."
             )
         for member in members:
-            logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
+            logChannel = discord.utils.get(
+                guild.text_channels, name="zorander-logs")
             if author.top_role > member.top_role:
                 if logChannel is None:
                     logChannel = await guild.create_text_channel("zorander-logs")
@@ -471,10 +478,12 @@ class Moderation(Cog):
         embed = Embed(
             color=Color.blurple(),
             timestamp=datetime.utcnow(),
-            description=warnings if len(warn_model) else "User hasn't been warned.",
+            description=warnings if len(
+                warn_model) else "User hasn't been warned.",
         )
         embed.set_footer(text=f"Requested by {author.name}")
-        embed.set_author(name=f"Warnings of {member.name}", icon_url=member.avatar_url)
+        embed.set_author(
+            name=f"Warnings of {member.name}", icon_url=member.avatar_url)
         await ctx.send(embed=embed)
 
     @warnings.group(name="delete", brief="Delete a warning of a user.")
