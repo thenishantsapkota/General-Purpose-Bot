@@ -595,6 +595,21 @@ class Moderation(Cog):
                 color=Color.blurple(),
             )
             await ctx.send(embed=embed)
+    
+    @role.group(name="list", brief = "List the admin, mod and staff roles of the server")
+    async def list_command(self, ctx):
+        author = ctx.author
+        guild = ctx.guild
+        model = await ModerationRoles.get_or_none(guild_id=guild.id)
+        embed = Embed(
+            color = Color.blurple(),
+            description = f"**Admin Role** - <@&{model.admin_role}>\n\n**Mod Role** - <@&{model.mod_role}>\n\n**Staff Role** - <@&{model.staff_role}>",
+            timestamp = datetime.utcnow()
+        )
+        embed.set_author(name=f"Staff Roles for {guild.name}", icon_url=guild.icon_url)
+        embed.set_footer(text = f"Invoked by {author}")
+        await ctx.send(embed=embed)
+        
 
     @role.group(name="give", aliases=["add"], brief="Add a role to the user.")
     # @commands.has_permissions(administrator=True)
@@ -975,8 +990,9 @@ class Moderation(Cog):
     #     if (payload.member.id != self.client.user.id and str(payload.emoji) in emojis):
     #         print(payload.message_id)
 
-    @command(name="clean", aliases=["purge"])
+    @command(name="clean", aliases=["purge"], brief = "Delete messages from certain channels.")
     async def clean_command(self, ctx, limit: Optional[int]=10):
+        """Delete messages from certain channels."""
         author = ctx.author
         guild = ctx.guild
         modrole = (await fetchRoleData(guild)).get("modrole")
