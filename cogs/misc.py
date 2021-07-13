@@ -439,6 +439,35 @@ class Misc(Cog):
             await ctx.send(f"**The invite link for this server is**\n{link}")
             #yes
             #no
+    
+    @command(name="nepse")
+    async def nepse_command(self, ctx, company:str, today_date:Optional[str]):
+        today_date =  today_date or date.today()
+        url = "https://api.sheezh.com/nepse/v1/price"
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, json ={"symbol": company.upper(), "date": str(today_date)}) as resp:
+                data = await resp.json()
+                maxprice = data[0]["MaxPrice"]
+                minprice = data[0]["MinPrice"]
+                closingprice = data[0]["ClosingPrice"]
+                tradedshares = data[0]["TradedShares"]
+                previousclosing = data[0]["PreviousClosing"]
+
+       
+            async with session.post("https://api.sheezh.com/nepse/v1/company", json={"symbol" : company}) as res:
+                name = await res.json()
+                companyName = name[0]["companyName"]
+        embed = Embed(
+            color = Color.blurple(),
+            timestamp = datetime.utcnow(),
+            description = f"**Maximum Price** - {maxprice}\n**Minimum Price** - {minprice}\n**Closing Price** - {closingprice}\n**Traded Shares** - {tradedshares}\n**Previous Closing Price** - {previousclosing}"
+        )
+        embed.set_thumbnail(url="https://cdn6.aptoide.com/imgs/a/8/4/a8435b6d8d3424dbc79a4ad52f976ad7_icon.png")
+        embed.set_author(name=f"Details for - {companyName} ")
+        await ctx.send(embed=embed)
+        
+
+
 
 
 def setup(client):
