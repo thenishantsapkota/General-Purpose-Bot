@@ -483,6 +483,7 @@ class Misc(Cog):
         embed.set_author(
             name=f"Suggestion by - {author}", icon_url=author.avatar_url)
         msg = await ctx.send(embed=embed)
+        await ctx.message.delete()
         for i in range(len(emojis)):
             await msg.add_reaction(emojis[i])
 
