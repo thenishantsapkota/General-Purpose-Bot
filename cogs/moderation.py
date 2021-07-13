@@ -597,6 +597,7 @@ class Moderation(Cog):
             await ctx.send(embed=embed)
     
     @role.group(name="list", brief = "List the admin, mod and staff roles of the server")
+    @commands.has_permissions(administrator = True)
     async def list_command(self, ctx):
         author = ctx.author
         guild = ctx.guild
