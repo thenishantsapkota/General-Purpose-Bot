@@ -975,6 +975,25 @@ class Moderation(Cog):
     #     if (payload.member.id != self.client.user.id and str(payload.emoji) in emojis):
     #         print(payload.message_id)
 
+    @command(name="clean", aliases=["purge"])
+    async def clean_command(self, ctx, limit: Optional[int]=10):
+        author = ctx.author
+        guild = ctx.guild
+        modrole = (await fetchRoleData(guild)).get("modrole")
+        if not (
+            await has_permissions(author, "manage_channels")
+            or await rolecheck(author, modrole)
+        ):
+            raise NotEnoughPermissions(
+                "You don't have either the roles required or the permissions."
+            )
+        if limit <= 100:
+            await ctx.message.delete()
+            await ctx.channel.purge(limit=limit)
+            await ctx.send("History deleted, Use Incognito next time.:wink:", delete_after = 10)
+        else:
+            await ctx.send("I can only delete 100 messages at a time** :rage:", delete_after=5)
+
 
 def setup(client):
     client.add_cog(Moderation(client))

@@ -140,7 +140,7 @@ class Misc(Cog):
     @command(name="botinvite", brief="Returns the invite link of bot")
     async def botinvite_command(self, ctx):
         """Returns the invite link of bot"""
-        invite = f"https://discord.com/oauth2/authorize?client_id={self.client.user.id}&permissions=128&scope=bot"
+        invite = f"https://discord.com/api/oauth2/authorize?client_id={self.client.user.id}&permissions=1374809815&scope=bot"
         await ctx.send(invite)
 
     @command(name="countryinfo", brief="Returns the info about the country provided.")
