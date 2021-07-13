@@ -602,6 +602,9 @@ class Moderation(Cog):
         author = ctx.author
         guild = ctx.guild
         model = await ModerationRoles.get_or_none(guild_id=guild.id)
+        if model is None:
+            await ctx.send("No data found.")
+            return
         embed = Embed(
             color = Color.blurple(),
             description = f"**Admin Role** - <@&{model.admin_role}>\n\n**Mod Role** - <@&{model.mod_role}>\n\n**Staff Role** - <@&{model.staff_role}>",
