@@ -73,7 +73,8 @@ class Misc(Cog):
         textChannels = len(ctx.guild.text_channels)
         voiceChannels = len(ctx.guild.voice_channels)
         roles = len(ctx.guild.roles)
-        guildCreatedate = ctx.guild.created_at.strftime("%a, %#d %B %Y, %I:%M %p")
+        guildCreatedate = ctx.guild.created_at.strftime(
+            "%a, %#d %B %Y, %I:%M %p")
 
         embed = Embed(
             title=f"Info of {ctx.guild.name} Server",
@@ -104,7 +105,8 @@ class Misc(Cog):
         id = member.id
         name = member.name
         accountAge = member.created_at.strftime("%a, %#d %B %Y, %I:%M %p UTC")
-        joinServerDate = member.joined_at.strftime("%a, %#d %B %Y, %I:%M %p UTC")
+        joinServerDate = member.joined_at.strftime(
+            "%a, %#d %B %Y, %I:%M %p UTC")
         highestRole = member.top_role.mention
 
         info = "Server Owner" if ctx.guild.owner is ctx.author else "Member"
@@ -204,7 +206,8 @@ class Misc(Cog):
                 f"**Name** - {name}\n**Blog URL** - {None if not blog else blog}\n**Location** - {location}\n**Twitter Username** - {twitter_username}\n **Public Repositories** - {publicrepos}\n**Followers** - {followers}\n**Following** - {following}"
             ),
         )
-        embed.set_author(name=f"Github Profile info of username {githubusername}")
+        embed.set_author(
+            name=f"Github Profile info of username {githubusername}")
         if avatar_url is not None:
             embed.set_thumbnail(url=avatar_url)
         await ctx.send(embed=embed)
@@ -345,7 +348,8 @@ class Misc(Cog):
             name=f"Your code was in  {str(result['language']).capitalize()}.",
             icon_url=ctx.author.avatar_url,
         )
-        embed.add_field(name="Output", value=f"`{output}`" or "**<No output>**")
+        embed.add_field(
+            name="Output", value=f"`{output}`" or "**<No output>**")
         embed.set_footer(text=f"Requested by {ctx.author.name}")
         await ctx.message.add_reaction("<a:loading:856179279292006430>")
         await asyncio.sleep(2)
@@ -437,15 +441,15 @@ class Misc(Cog):
         with ctx.channel.typing():
             link = await ctx.channel.create_invite(max_age=0)
             await ctx.send(f"**The invite link for this server is**\n{link}")
-            #yes
-            #no
-    
+            # yes
+            # no
+
     @command(name="nepse")
-    async def nepse_command(self, ctx, company:str, today_date:Optional[str]):
-        today_date =  today_date or date.today()
+    async def nepse_command(self, ctx, company: str, today_date: Optional[str]):
+        today_date = today_date or date.today()
         url = "https://api.sheezh.com/nepse/v1/price"
         async with aiohttp.ClientSession() as session:
-            async with session.post(url, json ={"symbol": company.upper(), "date": str(today_date)}) as resp:
+            async with session.post(url, json={"symbol": company.upper(), "date": str(today_date)}) as resp:
                 data = await resp.json()
                 maxprice = data[0]["MaxPrice"]
                 minprice = data[0]["MinPrice"]
@@ -453,21 +457,59 @@ class Misc(Cog):
                 tradedshares = data[0]["TradedShares"]
                 previousclosing = data[0]["PreviousClosing"]
 
-       
-            async with session.post("https://api.sheezh.com/nepse/v1/company", json={"symbol" : company}) as res:
+            async with session.post("https://api.sheezh.com/nepse/v1/company", json={"symbol": company}) as res:
                 name = await res.json()
                 companyName = name[0]["companyName"]
         embed = Embed(
-            color = Color.blurple(),
-            timestamp = datetime.utcnow(),
-            description = f"**Maximum Price** - {maxprice}\n**Minimum Price** - {minprice}\n**Closing Price** - {closingprice}\n**Traded Shares** - {tradedshares}\n**Previous Closing Price** - {previousclosing}"
+            color=Color.blurple(),
+            timestamp=datetime.utcnow(),
+            description=f"**Maximum Price** - {maxprice}\n**Minimum Price** - {minprice}\n**Closing Price** - {closingprice}\n**Traded Shares** - {tradedshares}\n**Previous Closing Price** - {previousclosing}"
         )
-        embed.set_thumbnail(url="https://cdn6.aptoide.com/imgs/a/8/4/a8435b6d8d3424dbc79a4ad52f976ad7_icon.png")
+        embed.set_thumbnail(
+            url="https://cdn6.aptoide.com/imgs/a/8/4/a8435b6d8d3424dbc79a4ad52f976ad7_icon.png")
         embed.set_author(name=f"Details for - {companyName} ")
         await ctx.send(embed=embed)
-        
 
+    @commands.group(invoke_without_command=True)
+    async def suggest(self, ctx, *, suggestion: str):
+        emojis = ["✅", "❌"]
+        author = ctx.author
+        guild = ctx.guild
+        embed = Embed(
+            color=Color.blurple(),
+            timestamp=datetime.utcnow()
+        )
+        embed.add_field(name="Suggestion", value=suggestion)
+        embed.set_author(
+            name=f"Suggestion by - {author}", icon_url=author.avatar_url)
+        msg = await ctx.send(embed=embed)
+        for i in range(len(emojis)):
+            await msg.add_reaction(emojis[i])
 
+    @suggest.group(name="approve")
+    @commands.has_permissions(administrator=True)
+    async def approve_command(self, ctx, msgID: int):
+        msg = await ctx.fetch_message(msgID)
+        embed = msg.embeds[0]
+        if embed is None:
+            return
+        embed.set_footer(text=f"Approved by {ctx.author}")
+        embed.color = Color.green()
+        await msg.edit(embed=embed)
+        await msg.clear_reactions()
+
+    @suggest.group(name="deny")
+    @commands.has_permissions(administrator=True)
+    async def deny_command(self, ctx, msgID: int, *, reason:str):
+        msg = await ctx.fetch_message(msgID)
+        embed = msg.embeds[0]
+        if embed is None:
+            return
+        embed.title = f"Denial Reason - {reason}"
+        embed.set_footer(text=f"Denied by {ctx.author}")
+        embed.color = Color.red()
+        await msg.edit(embed=embed)
+        await msg.clear_reactions()
 
 
 def setup(client):
