@@ -470,8 +470,9 @@ class Misc(Cog):
         embed.set_author(name=f"Details for - {companyName} ")
         await ctx.send(embed=embed)
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True, brief = "Suggestion command. Use arguments `approve`, `deny` as arguments.")
     async def suggest(self, ctx, *, suggestion: str):
+        """Suggestion command. Use arguments `approve`, `deny` as arguments."""
         emojis = ["✅", "❌"]
         author = ctx.author
         guild = ctx.guild

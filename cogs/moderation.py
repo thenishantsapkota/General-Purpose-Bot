@@ -1013,6 +1013,14 @@ class Moderation(Cog):
             await ctx.send("History deleted, Use Incognito next time.:wink:", delete_after = 10)
         else:
             await ctx.send("I can only delete 100 messages at a time** :rage:", delete_after=5)
+    
+    @command(name="send", aliases = ["say"], brief ="Send a message to the channel you specify in.")
+    @commands.has_permissions(administrator=True)
+    async def send_command(self, ctx, channel:Optional[TextChannel], *, message:str):
+        """Send a message to the channel you specify in."""
+        channel = channel or ctx.channel
+        await channel.send(message)
+        await ctx.message.delete()
 
 
 def setup(client):
