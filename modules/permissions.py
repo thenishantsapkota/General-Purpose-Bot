@@ -1,7 +1,12 @@
 import discord
 from discord import Guild, Member, Role
+from discord.ext import commands
 
 from models import ModerationRoles
+
+
+class NotEnoughPermissions(commands.CommandError):
+    pass
 
 
 async def has_permissions(member: Member, permission: str):
