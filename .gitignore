@@ -131,3 +131,4 @@ dmypy.json
 .env
 db/
 cogs/itsnp.py
+.vscode/
