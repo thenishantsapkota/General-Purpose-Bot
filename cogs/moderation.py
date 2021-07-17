@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from io import BytesIO
 from re import A
 from typing import Text
+from discord import channel
 
 import pytz
 
@@ -601,6 +602,18 @@ class Moderation(Cog):
         embed.set_author(name=f"Staff Roles for {guild.name}", icon_url=guild.icon_url)
         embed.set_footer(text=f"Invoked by {author}")
         await ctx.send(embed=embed)
+    
+    @role.group(name="clear", brief="Clear Moderation roles from the server.")
+    @commands.has_permissions(administrator = True)
+    async def clear_command(self,ctx):
+        model = await ModerationRoles.get_or_none(guild_id = ctx.guild.id)
+        await model.delete()
+        embed = Embed(
+            color = Color.blurple(),
+        )
+        embed.set_author(name=f"Cleared moderation roles for the server.")
+        await ctx.send(embed=embed)
+
 
     @role.group(name="give", aliases=["add"], brief="Add a role to the user.")
     # @commands.has_permissions(administrator=True)
@@ -757,6 +770,28 @@ class Moderation(Cog):
             description="🔓 Channel has been unlocked!",
             color=Color.green(),
         )
+        await ctx.send(embed=embed)
+    
+    @channel.group(name="rename")
+
+    async def rename_command(self, ctx, channel:TextChannel, new_name:str):
+        guild = ctx.guild
+        author = ctx.author
+        modrole = (await fetchRoleData(guild)).get("modrole")
+        if not (
+            await has_permissions(author, "manage_channels")
+            or await rolecheck(author, modrole)
+        ):
+            raise NotEnoughPermissions(
+                "You don't have either the roles required or the permissions."
+            )
+        await channel.edit(name=new_name)
+        embed = Embed(
+            color = Color.blurple(),
+            description = f"Changed the name of {channel.mention} to `{new_name}`",
+            timestamp = datetime.utcnow()
+        )
+        embed.set_author(name=f"Channel Rename")
         await ctx.send(embed=embed)
 
     @commands.group(

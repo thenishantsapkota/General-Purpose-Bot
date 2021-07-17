@@ -145,6 +145,7 @@ class Utils(Cog):
         embed.set_author(name=f"Members in {role}")
         embed.set_footer(text=f"Invoked by {author}")
         await ctx.send(embed=embed)
+    
 
 def setup(client):
     client.add_cog(Utils(client))
