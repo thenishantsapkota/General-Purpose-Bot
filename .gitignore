@@ -134,3 +134,4 @@ cogs/itsnp.py
 .vscode/
 
 aerich.ini
+requirements.txt
