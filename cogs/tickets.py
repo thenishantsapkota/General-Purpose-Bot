@@ -1,5 +1,5 @@
+from models import ModerationRoles, PrefixModel, TicketModel
 from modules.imports import *
-from models import TicketModel, ModerationRoles, PrefixModel
 
 
 class NotEnoughPermissions(commands.CommandError):

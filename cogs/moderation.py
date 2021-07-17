@@ -2,11 +2,10 @@ from datetime import date, timedelta
 from io import BytesIO
 from re import A
 from typing import Text
-from cogs.help import Help
-
 
 import pytz
 
+from cogs.help import Help
 from models import ModerationRoles, MuteModel, PrefixModel, WarnModel
 from modules.imports import *
 from modules.permissions import *
@@ -146,8 +145,7 @@ class Moderation(Cog):
         localized_mutetime = model.time
         localized_nowtime = utc.localize(datetime.now())
         if localized_mutetime > localized_nowtime:
-            remaining_time = (localized_mutetime -
-                              localized_nowtime).total_seconds()
+            remaining_time = (localized_mutetime - localized_nowtime).total_seconds()
             await asyncio.sleep(remaining_time)
             await self.mute_handler_get(model)
             # print("Success")
@@ -158,11 +156,9 @@ class Moderation(Cog):
     async def mute_handler_get(self, model: MuteModel):
         guild = self.client.get_guild(model.guild_id)
         member = guild.get_member(model.member_id)
-        logChannel = discord.utils.get(
-            guild.text_channels, name="zorander-logs")
+        logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
         role_ids = model.role_id
-        roles = [guild.get_role(int(id_))
-                 for id_ in role_ids.split(",") if len(id_)]
+        roles = [guild.get_role(int(id_)) for id_ in role_ids.split(",") if len(id_)]
         await member.edit(roles=roles)
         await model.delete()
         embed = Embed(
@@ -226,9 +222,7 @@ class Moderation(Cog):
                     await logChannel.set_permissions(
                         guild.default_role, view_channel=False, send_messages=False
                     )
-                model = await MuteModel.get(
-                    guild_id=guild.id, member_id=member.id
-                )
+                model = await MuteModel.get(guild_id=guild.id, member_id=member.id)
                 role_ids = model.role_id
                 roles = [
                     guild.get_role(int(id_)) for id_ in role_ids.split(",") if len(id_)
@@ -271,8 +265,7 @@ class Moderation(Cog):
             raise NotEnoughPermissions(
                 "You don't have either the roles required or the permissions."
             )
-        logChannel = discord.utils.get(
-            guild.text_channels, name="zorander-logs")
+        logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
         for member in members:
             if author.top_role > member.top_role:
                 if logChannel is None:
@@ -318,8 +311,7 @@ class Moderation(Cog):
             raise NotEnoughPermissions(
                 "You don't have either the roles required or the permissions."
             )
-        logChannel = discord.utils.get(
-            guild.text_channels, name="zorander-logs")
+        logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
         for member in members:
             # if author.top_role > member.top_role:
             if logChannel is None:
@@ -364,8 +356,7 @@ class Moderation(Cog):
             raise NotEnoughPermissions(
                 "You don't have either the roles required or the permissions."
             )
-        logChannel = discord.utils.get(
-            guild.text_channels, name="zorander-logs")
+        logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
         if logChannel is None:
             logChannel = await guild.create_text_channel("zorander-logs")
             await logChannel.set_permissions(
@@ -402,8 +393,7 @@ class Moderation(Cog):
                 "You don't have either the roles required or the permissions."
             )
         for member in members:
-            logChannel = discord.utils.get(
-                guild.text_channels, name="zorander-logs")
+            logChannel = discord.utils.get(guild.text_channels, name="zorander-logs")
             if author.top_role > member.top_role:
                 if logChannel is None:
                     logChannel = await guild.create_text_channel("zorander-logs")
@@ -478,12 +468,10 @@ class Moderation(Cog):
         embed = Embed(
             color=Color.blurple(),
             timestamp=datetime.utcnow(),
-            description=warnings if len(
-                warn_model) else "User hasn't been warned.",
+            description=warnings if len(warn_model) else "User hasn't been warned.",
         )
         embed.set_footer(text=f"Requested by {author.name}")
-        embed.set_author(
-            name=f"Warnings of {member.name}", icon_url=member.avatar_url)
+        embed.set_author(name=f"Warnings of {member.name}", icon_url=member.avatar_url)
         await ctx.send(embed=embed)
 
     @warnings.group(name="delete", brief="Delete a warning of a user.")
@@ -595,8 +583,8 @@ class Moderation(Cog):
                 color=Color.blurple(),
             )
             await ctx.send(embed=embed)
-    
-    @role.group(name="list", brief = "List the admin, mod and staff roles of the server")
+
+    @role.group(name="list", brief="List the admin, mod and staff roles of the server")
     @commands.is_owner()
     async def list_command(self, ctx):
         author = ctx.author
@@ -606,14 +594,13 @@ class Moderation(Cog):
             await ctx.send("No data found.")
             return
         embed = Embed(
-            color = Color.blurple(),
-            description = f"**Admin Role** - <@&{model.admin_role}>\n\n**Mod Role** - <@&{model.mod_role}>\n\n**Staff Role** - <@&{model.staff_role}>",
-            timestamp = datetime.utcnow()
+            color=Color.blurple(),
+            description=f"**Admin Role** - <@&{model.admin_role}>\n\n**Mod Role** - <@&{model.mod_role}>\n\n**Staff Role** - <@&{model.staff_role}>",
+            timestamp=datetime.utcnow(),
         )
         embed.set_author(name=f"Staff Roles for {guild.name}", icon_url=guild.icon_url)
-        embed.set_footer(text = f"Invoked by {author}")
+        embed.set_footer(text=f"Invoked by {author}")
         await ctx.send(embed=embed)
-        
 
     @role.group(name="give", aliases=["add"], brief="Add a role to the user.")
     # @commands.has_permissions(administrator=True)
@@ -994,8 +981,10 @@ class Moderation(Cog):
     #     if (payload.member.id != self.client.user.id and str(payload.emoji) in emojis):
     #         print(payload.message_id)
 
-    @command(name="clean", aliases=["purge"], brief = "Delete messages from certain channels.")
-    async def clean_command(self, ctx, limit: Optional[int]=10):
+    @command(
+        name="clean", aliases=["purge"], brief="Delete messages from certain channels."
+    )
+    async def clean_command(self, ctx, limit: Optional[int] = 10):
         """Delete messages from certain channels."""
         author = ctx.author
         guild = ctx.guild
@@ -1010,13 +999,21 @@ class Moderation(Cog):
         if limit <= 100:
             await ctx.message.delete()
             await ctx.channel.purge(limit=limit)
-            await ctx.send("History deleted, Use Incognito next time.:wink:", delete_after = 10)
+            await ctx.send(
+                "History deleted, Use Incognito next time.:wink:", delete_after=10
+            )
         else:
-            await ctx.send("I can only delete 100 messages at a time** :rage:", delete_after=5)
-    
-    @command(name="send", aliases = ["say"], brief ="Send a message to the channel you specify in.")
+            await ctx.send(
+                "I can only delete 100 messages at a time** :rage:", delete_after=5
+            )
+
+    @command(
+        name="send",
+        aliases=["say"],
+        brief="Send a message to the channel you specify in.",
+    )
     @commands.has_permissions(administrator=True)
-    async def send_command(self, ctx, channel:Optional[TextChannel], *, message:str):
+    async def send_command(self, ctx, channel: Optional[TextChannel], *, message: str):
         """Send a message to the channel you specify in."""
         channel = channel or ctx.channel
         await channel.send(message)

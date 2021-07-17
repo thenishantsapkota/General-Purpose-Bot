@@ -106,6 +106,17 @@ class Fun(Cog):
     #         m = await ctx.send(member.mention)
     #         await m.delete()
 
+    @commands.command(name="panda")
+    async def panda_command(self, ctx):
+        async with aiohttp.ClientSession() as session:
+            request = await session.get("https://some-random-api.ml/img/panda")
+            panda_json = await request.json()
+        embed = Embed(title="Here's a panda for you!", color=Color.blurple())
+        embed.set_image(url=panda_json["link"])
+        embed.set_footer(text=f"Requested by {ctx.author.name}")
+
+        await ctx.send(embed=embed)
+
 
 def setup(client):
     client.add_cog(Fun(client))

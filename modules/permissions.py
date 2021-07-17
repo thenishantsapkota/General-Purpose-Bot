@@ -1,5 +1,6 @@
 import discord
-from discord import Member, Role, Guild
+from discord import Guild, Member, Role
+
 from models import ModerationRoles
 
 
