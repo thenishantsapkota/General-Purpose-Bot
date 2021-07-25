@@ -33,9 +33,11 @@ async def fetchRoleData(guild: Guild):
     adminrole = discord.utils.get(guild.roles, id=model.admin_role)
     modrole = discord.utils.get(guild.roles, id=model.mod_role)
     staffrole = discord.utils.get(guild.roles, id=model.staff_role)
+    coder_girls_lead = discord.utils.get(guild.roles, id=868748867661864990)
     roles = {
         "adminrole": adminrole,
         "modrole": modrole,
         "staffrole": staffrole,
+        "codergirlslead": coder_girls_lead
     }
     return roles
