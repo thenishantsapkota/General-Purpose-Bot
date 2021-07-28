@@ -119,7 +119,6 @@ class Utils(Cog):
         """Delete an emoji from the server."""
         await ctx.send(f"{emoji} | Emote deleted sucessfully.")
         await emoji.delete()
-    
 
     @command(name="members")
     async def members_in_role(self, ctx, role: Role):
@@ -145,7 +144,17 @@ class Utils(Cog):
         embed.set_author(name=f"Members in {role}")
         embed.set_footer(text=f"Invoked by {author}")
         await ctx.send(embed=embed)
-    
+
+    @command(name="embed")
+    @commands.has_permissions(administrator=True)
+    async def embed(self, ctx: commands.Context, *, message: str):
+        embed = Embed(
+            color=Color.gold(),
+            description=message,
+            timestamp=datetime.utcnow()
+        )
+        await ctx.send(embed=embed)
+
 
 def setup(client):
     client.add_cog(Utils(client))
