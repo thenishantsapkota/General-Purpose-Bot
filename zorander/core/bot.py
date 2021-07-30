@@ -15,7 +15,10 @@ from ..utils.cogreload import CogsReload
 from .models import GuildModel
 from .tortoise_config import tortoise_config
 
-load_dotenv()
+
+os.environ.setdefault("JISHAKU_HIDE", "1")
+os.environ.setdefault("JISHAKU_RETAIN", "1")
+os.environ.setdefault("JISHAKU_NO_UNDERSCORE", "1")
 
 logger = logging.getLogger("zorander.main")
 logging.basicConfig(level=logging.INFO)
