@@ -15,7 +15,6 @@ from ..utils.cogreload import CogsReload
 from .models import GuildModel
 from .tortoise_config import tortoise_config
 
-
 os.environ.setdefault("JISHAKU_HIDE", "1")
 os.environ.setdefault("JISHAKU_RETAIN", "1")
 os.environ.setdefault("JISHAKU_NO_UNDERSCORE", "1")
@@ -47,12 +46,12 @@ class Bot(commands.Bot):
         return when_mentioned_or(prefix)(bot, message)
 
     @tasks.loop(seconds=0, count=1)
-    async def connect_db(self):
+    async def connect_db(self) -> None:
         logger.info("Connecting to the Database....")
         await Tortoise.init(tortoise_config)
         logger.info("Connected to DB.")
 
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         self.reloader.cog_watcher_task.start()
         logger.info("Started Cog Reloader.")
         await self.loader.cog_load()

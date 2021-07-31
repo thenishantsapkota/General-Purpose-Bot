@@ -1,3 +1,5 @@
+import asyncio
+import logging
 from datetime import datetime
 
 import discord
@@ -13,6 +15,7 @@ from ..core.models import GuildModel
 class Utils(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
+        self.bot.sniped_messages = {}
 
     @command(
         name="changeprefix", aliases=["chp"], brief="Change the prefix of the server."
