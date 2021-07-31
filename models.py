@@ -100,3 +100,13 @@ class TicketModel(Model):
     class Meta:
         table = "tickets"
         table_description = "Stores info about tickets"
+
+
+class JoinToCreate(Model):
+    id = fields.IntField(pk=True)
+    member_id = fields.BigIntField()
+    channel_id = fields.BigIntField()
+
+    class Meta:
+        table="voice_channels"
+        table_description = "Stores info about voice channels created."
