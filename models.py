@@ -103,9 +103,9 @@ class TicketModel(Model):
 
 
 class JoinToCreate(Model):
-    id = fields.IntField(pk=True)
-    member_id = fields.BigIntField()
-    channel_id = fields.BigIntField()
+    id = fields.IntField(pk=True, null=True)
+    member_id = fields.BigIntField(null=True)
+    channel_id = fields.BigIntField(null=True)
 
     class Meta:
         table="voice_channels"
