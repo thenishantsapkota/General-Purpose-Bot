@@ -515,7 +515,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player.queue.shuffle()
         embed = discord.Embed(
             color=ctx.author.color,
-            description = f"** | Queue has been shuffled.**"
+            description = f"🔀** | Queue has been shuffled.**"
         )
         await ctx.send(embed=embed)
 
