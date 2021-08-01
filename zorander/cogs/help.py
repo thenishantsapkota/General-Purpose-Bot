@@ -48,7 +48,7 @@ class Help(Cog):
                     continue
                 cogs_desc += f"`{cog}` {self.bot.cogs[cog].__doc__}\n"
 
-            embed.add_field(name="Cogs", value=cogs_desc, inline=True)
+            embed.add_field(name="Cogs", value=cogs_desc, inline=False)
 
             commands_desc = ""
             for command in self.bot.walk_commands():
@@ -57,7 +57,7 @@ class Help(Cog):
 
             if commands_desc:
                 embed.add_field(
-                    name="Not belonging to a Cog.", value=commands_desc, inline=True
+                    name="Not belonging to a Cog.", value=commands_desc, inline=False
                 )
 
                 embed.add_field(name="About", value=f"This bot is maintained by {owner}")
@@ -78,7 +78,7 @@ class Help(Cog):
                             embed.add_field(
                                 name=f"{prefix}{command.name}",
                                 value=command.help,
-                                inline=True,
+                                inline=False,
                             )
                     break
 
