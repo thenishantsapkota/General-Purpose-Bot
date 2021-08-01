@@ -399,7 +399,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="disconnect", aliases=["leave", "dc", "fuckoff"])
     @commands.has_role("DJ")
     async def disconnect_command(self, ctx: commands.Context):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -411,7 +412,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="play", aliases=["p"])
     # @commands.has_role("DJ")
     async def play_command(self, ctx, *, query: t.Optional[str]):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -442,7 +444,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="pause")
     @commands.has_role("DJ")
     async def pause_command(self, ctx):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -462,7 +465,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="stop")
     @commands.has_role("DJ")
     async def stop_command(self, ctx):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -474,7 +478,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="next", aliases=["skip", "n"])
     @commands.has_role("DJ")
     async def next_command(self, ctx):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -501,7 +506,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="previous", aliases=["prev"])
     @commands.has_role("DJ")
     async def previous_command(self, ctx):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -529,7 +535,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="shuffle")
     @commands.has_role("DJ")
     async def shuffle_command(self, ctx):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -548,7 +555,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="repeat")
     @commands.has_role("DJ")
     async def repeat_command(self, ctx, mode: str = None):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -633,7 +641,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="clear")
     @commands.has_role("DJ")
     async def clear_command(self, ctx):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -656,7 +665,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.group(name="volume", invoke_without_command=True)
     async def volume_group(self, ctx, volume: int):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -684,7 +694,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @volume_group.command(name="up")
     async def volume_up_command(self, ctx):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -707,7 +718,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @volume_group.command(name="down")
     async def volume_down_command(self, ctx):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -760,7 +772,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="eq")
     async def eq_command(self, ctx, preset: str):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -781,7 +794,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="adveq", aliases=["aeq"])
     async def adveq_command(self, ctx, band: int, gain: float):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -855,7 +869,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="skipto", aliases=["playindex"])
     async def skipto_command(self, ctx, index: int):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -879,7 +894,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="restart")
     async def restart_command(self, ctx):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
@@ -897,7 +913,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="seek")
     async def seek_command(self, ctx, position: str):
-        if ctx.author.voice.channel != self.bot.user.voice.channel:
+        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        if ctx.author.voice.channel != bot_member.voice.channel:
             await ctx.send("You need to be in the same voice channel as me. :smirk:")
             return
         player = self.get_player(ctx)
