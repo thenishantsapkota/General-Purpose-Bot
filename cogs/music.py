@@ -469,9 +469,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         await player.stop()
         # await ctx.send("Playing next track in queue.")
-        embed = discord.Embed(color=ctx.author.color)
-        embed.set_author(
-            name="Playing next track in the queue!", icon_url=ctx.author.avatar_url
+        embed = discord.Embed(color=ctx.author.color,
+            description = f"⏭️** | Playing next track in the queue!**"
         )
         await ctx.send(embed=embed)
 
@@ -516,9 +515,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player.queue.shuffle()
         embed = discord.Embed(
             color=ctx.author.color,
-        )
-        embed.set_author(
-            name="Queue has been shuffled.", icon_url=ctx.author.avatar_url
+            description = f"** | Queue has been shuffled.**"
         )
         await ctx.send(embed=embed)
 
@@ -643,7 +640,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         #await ctx.send(f"Volume set to {volume:,}%")
         embed = discord.Embed(
             color = discord.Color.green(),
-            description = f"🔊| **Volume set to {volume:,}%**"
+            description = f"🔊** | Volume set to {volume:,}%**"
         )
         await ctx.send(embed=embed)
 
@@ -665,7 +662,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         #await ctx.send(f"Volume set to {value:,}%")
         embed = discord.Embed(
             color = discord.Color.green(),
-            description = f"🔊| **Volume set to {volume:,}%**"
+            description = f"🔊** | Volume set to {volume:,}%**"
         )
         await ctx.send(embed=embed)
 
@@ -685,7 +682,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         #await ctx.send(f"Volume set to {value:,}%")
         embed = discord.Embed(
             color = discord.Color.green(),
-            description = f"🔉| **Volume set to {volume:,}%**"
+            description = f"🔉** | Volume set to {volume:,}%**"
         )
         await ctx.send(embed=embed)
 
@@ -865,7 +862,12 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             secs = int(match.group(1))
 
         await player.seek(secs * 1000)
-        await ctx.send("Seeked.")
+        #await ctx.send("Seeked.")
+        embed = discord.Embed(
+            color=ctx.author.color,
+            description = f"⏩** | Seeked to {position}**"
+        )
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
