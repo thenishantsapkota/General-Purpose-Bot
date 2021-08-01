@@ -13,6 +13,8 @@ from ..core.models import GuildModel
 
 
 class Utils(Cog):
+    """Houses utility Commands for the guild."""
+
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.bot.sniped_messages = {}
