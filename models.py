@@ -108,5 +108,5 @@ class JoinToCreate(Model):
     channel_id = fields.BigIntField(null=True)
 
     class Meta:
-        table="voice_channels"
+        table = "voice_channels"
         table_description = "Stores info about voice channels created."

@@ -399,7 +399,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="disconnect", aliases=["leave", "dc", "fuckoff"])
     @commands.has_role("DJ")
     async def disconnect_command(self, ctx: commands.Context):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -415,7 +415,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="play", aliases=["p"])
     # @commands.has_role("DJ")
     async def play_command(self, ctx, *, query: t.Optional[str]):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -450,7 +450,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="pause")
     @commands.has_role("DJ")
     async def pause_command(self, ctx):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -474,7 +474,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="stop")
     @commands.has_role("DJ")
     async def stop_command(self, ctx):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -490,7 +490,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="next", aliases=["skip", "n"])
     @commands.has_role("DJ")
     async def next_command(self, ctx):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -521,7 +521,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="previous", aliases=["prev"])
     @commands.has_role("DJ")
     async def previous_command(self, ctx):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -553,7 +553,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="shuffle")
     @commands.has_role("DJ")
     async def shuffle_command(self, ctx):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -576,7 +576,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="repeat")
     @commands.has_role("DJ")
     async def repeat_command(self, ctx, mode: str = None):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -665,7 +665,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="clear")
     @commands.has_role("DJ")
     async def clear_command(self, ctx):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -692,7 +692,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.group(name="volume", invoke_without_command=True)
     async def volume_group(self, ctx, volume: int):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -724,7 +724,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @volume_group.command(name="up")
     async def volume_up_command(self, ctx):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -751,7 +751,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @volume_group.command(name="down")
     async def volume_down_command(self, ctx):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -808,7 +808,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="eq")
     async def eq_command(self, ctx, preset: str):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -833,7 +833,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="adveq", aliases=["aeq"])
     async def adveq_command(self, ctx, band: int, gain: float):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -911,7 +911,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="skipto", aliases=["playindex"])
     async def skipto_command(self, ctx, index: int):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -939,7 +939,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="restart")
     async def restart_command(self, ctx):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:
@@ -961,7 +961,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="seek")
     async def seek_command(self, ctx, position: str):
-        bot_member = discord.utils.get(ctx.guild.members, id = self.bot.user.id)
+        bot_member = ctx.guild.get_member(self.bot.user.id)
         if bot_member.voice.channel is None or ctx.author.voice.channel is None:
             pass
         else:

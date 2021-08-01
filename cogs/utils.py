@@ -149,9 +149,7 @@ class Utils(Cog):
     @commands.has_permissions(administrator=True)
     async def embed(self, ctx: commands.Context, *, message: str):
         embed = Embed(
-            color=Color.gold(),
-            description=message,
-            timestamp=datetime.utcnow()
+            color=Color.gold(), description=message, timestamp=datetime.utcnow()
         )
         await ctx.send(embed=embed)
 
