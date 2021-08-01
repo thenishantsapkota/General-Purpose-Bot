@@ -8,8 +8,11 @@ from db.db_token import token
 from models import OverrideModel, PrefixModel
 from modules.imports import *
 from tortoise_config import tortoise_config
+from dotenv import load_dotenv
 
 TOKEN = token
+load_dotenv()
+
 
 intents = discord.Intents.default()
 intents.members = True
@@ -88,4 +91,4 @@ async def on_ready():
     cog_watcher_task.start()
 
 
-client.run(TOKEN)
+client.run(os.environ.get("BOT_KEY"))
