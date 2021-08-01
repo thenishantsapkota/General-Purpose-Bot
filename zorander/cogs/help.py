@@ -3,7 +3,7 @@ from pathlib import Path
 import asyncio
 
 import discord
-from discord import Color, embed
+from discord import Color, Embed
 from discord.ext import commands
 from discord.ext.commands import Cog, command
 from dotenv import load_dotenv
@@ -32,11 +32,11 @@ class Help(Cog):
         prefix = model.prefix
         if not params:
             try:
-                owner = ctx.guild.get_membeder(os.getenv("OWNER_ID")).mention
+                owner = ctx.guild.get_member(os.getenv("OWNER_ID")).mention
 
             except AttributeError:
                 owner = os.getenv("OWNER_NAME")
-            embed = discord.embed(
+            embed = discord.Embed(
                 title="Commands and Cogs",
                 color=self.bot.color,
                 description=f"Use `{prefix}help <cog>` to gain more information about that Cog.",
@@ -67,7 +67,7 @@ class Help(Cog):
             for cog in self.bot.cogs:
                 if cog.lower() == params[0].lower():
 
-                    embed = discord.embed(
+                    embed = discord.Embed(
                         title=f"{cog} - commands",
                         description=self.bot.cogs[cog].__doc__,
                         color=self.bot.color,
@@ -83,14 +83,14 @@ class Help(Cog):
                     break
 
             else:
-                embed = discord.embed(
+                embed = discord.Embed(
                     title=f"Uh Oh?! {EMOJI}",
                     description=f"I've never heard of a cog called `{params[0]}` before.",
                     color=Color.orange(),
                 )
 
         elif len(params) > 1:
-            embed = discord.embed(
+            embed = discord.Embed(
                 title=f"Uhhhh {EMOJI}",
                 description=f"Looks like you passed me more arguments than I actually needed.",
                 color=Color.orange(),
