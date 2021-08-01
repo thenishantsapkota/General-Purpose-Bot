@@ -399,46 +399,32 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="disconnect", aliases=["leave", "dc", "fuckoff"])
     @commands.has_role("DJ")
     async def disconnect_command(self, ctx: commands.Context):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
-        else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
-            await player.teardown()
-            player.queue.empty()
-            # await ctx.send("Disconnected.")
-            await ctx.message.add_reaction("👋")
+        player = self.get_player(ctx)
+        await player.teardown()
+        player.queue.empty()
+        # await ctx.send("Disconnected.")
+        await ctx.message.add_reaction("👋")
 
     @commands.command(name="play", aliases=["p"])
     # @commands.has_role("DJ")
     async def play_command(self, ctx, *, query: t.Optional[str]):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
+        player = self.get_player(ctx)
+
+        if not player.is_connected:
+            await player.connect(ctx)
+
+        if query is None:
+            if player.queue.is_empty:
+                raise QueueIsEmpty
+
+            await ctx.message.add_reaction("▶️")
+
         else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
+            query = query.strip("<>")
+            if not re.match(URL_REGEX, query):
+                query = f"ytsearch:{query}"
 
-            if not player.is_connected:
-                await player.connect(ctx)
-
-            if query is None:
-                if player.queue.is_empty:
-                    raise QueueIsEmpty
-
-                await ctx.message.add_reaction("▶️")
-
-            else:
-                query = query.strip("<>")
-                if not re.match(URL_REGEX, query):
-                    query = f"ytsearch:{query}"
-
-                await player.add_tracks(ctx, await self.wavelink.get_tracks(query))
+            await player.add_tracks(ctx, await self.wavelink.get_tracks(query))
 
     @play_command.error
     async def play_command_error(self, ctx, exc):
@@ -450,21 +436,14 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="pause")
     @commands.has_role("DJ")
     async def pause_command(self, ctx):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
-        else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
+        player = self.get_player(ctx)
 
-            if player.is_paused:
-                raise PlayerIsAlreadyPaused
+        if player.is_paused:
+            raise PlayerIsAlreadyPaused
 
-            await player.set_pause(True)
-            # await ctx.send("Playback paused.")
-            await ctx.message.add_reaction("⏸")
+        await player.set_pause(True)
+        # await ctx.send("Playback paused.")
+        await ctx.message.add_reaction("⏸")
 
     @pause_command.error
     async def pause_command_error(self, ctx, exc):
@@ -474,40 +453,26 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="stop")
     @commands.has_role("DJ")
     async def stop_command(self, ctx):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
-        else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
-            player.queue.empty()
-            await player.stop()
-            # await ctx.send("Playback stopped.")
-            await ctx.message.add_reaction("🛑")
+        player = self.get_player(ctx)
+        player.queue.empty()
+        await player.stop()
+        # await ctx.send("Playback stopped.")
+        await ctx.message.add_reaction("🛑")
 
     @commands.command(name="next", aliases=["skip", "n"])
     @commands.has_role("DJ")
     async def next_command(self, ctx):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
-        else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
+        player = self.get_player(ctx)
 
-            if not player.queue.upcoming:
-                raise NoMoreTracks
+        if not player.queue.upcoming:
+            raise NoMoreTracks
 
-            await player.stop()
-            # await ctx.send("Playing next track in queue.")
-            embed = discord.Embed(color=ctx.author.color,
-                description = f"⏭️** | Playing next track in the queue!**"
-            )
-            await ctx.send(embed=embed)
+        await player.stop()
+        # await ctx.send("Playing next track in queue.")
+        embed = discord.Embed(color=ctx.author.color,
+            description = f"⏭️** | Playing next track in the queue!**"
+        )
+        await ctx.send(embed=embed)
 
     @next_command.error
     async def next_command_error(self, ctx, exc):
@@ -521,25 +486,18 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="previous", aliases=["prev"])
     @commands.has_role("DJ")
     async def previous_command(self, ctx):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
-        else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
+        player = self.get_player(ctx)
 
-            if not player.queue.history:
-                raise NoPreviousTracks
+        if not player.queue.history:
+            raise NoPreviousTracks
 
-            player.queue.position -= 2
-            await player.stop()
-            embed = discord.Embed(color=ctx.author.color)
-            embed.set_author(
-                name="Playing previous track in the queue!", icon_url=ctx.author.avatar_url
-            )
-            await ctx.send(embed=embed)
+        player.queue.position -= 2
+        await player.stop()
+        embed = discord.Embed(color=ctx.author.color)
+        embed.set_author(
+            name="Playing previous track in the queue!", icon_url=ctx.author.avatar_url
+        )
+        await ctx.send(embed=embed)
 
     @previous_command.error
     async def previous_command_error(self, ctx, exc):
@@ -553,20 +511,13 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="shuffle")
     @commands.has_role("DJ")
     async def shuffle_command(self, ctx):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
-        else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
-            player.queue.shuffle()
-            embed = discord.Embed(
-                color=ctx.author.color,
-                description = f"🔀** | Queue has been shuffled.**"
-            )
-            await ctx.send(embed=embed)
+        player = self.get_player(ctx)
+        player.queue.shuffle()
+        embed = discord.Embed(
+            color=ctx.author.color,
+            description = f"🔀** | Queue has been shuffled.**"
+        )
+        await ctx.send(embed=embed)
 
     @shuffle_command.error
     async def shuffle_command_error(self, ctx, exc):
@@ -576,29 +527,22 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="repeat")
     @commands.has_role("DJ")
     async def repeat_command(self, ctx, mode: str = None):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
-        else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
-            if mode not in ("none", "1", "all"):
-                player.queue.set_repeat_mode(1)
-                embed = discord.Embed(
-                    color=ctx.author.color,
-                )
-                embed.set_footer(text=f"Invoked by {ctx.author}")
-                embed.set_author(name=f"Looping the current song!")
-                await ctx.send(embed=embed)
-
-            player.queue.set_repeat_mode(mode)
-            # await ctx.send(f"The repeat mode has been set to {mode}.")
-            embed = discord.Embed(color=ctx.author.color)
-            embed.set_author(name=f"The repeat mode has been set to {mode}")
+        player = self.get_player(ctx)
+        if mode not in ("none", "1", "all"):
+            player.queue.set_repeat_mode(1)
+            embed = discord.Embed(
+                color=ctx.author.color,
+            )
             embed.set_footer(text=f"Invoked by {ctx.author}")
+            embed.set_author(name=f"Looping the current song!")
             await ctx.send(embed=embed)
+
+        player.queue.set_repeat_mode(mode)
+        # await ctx.send(f"The repeat mode has been set to {mode}.")
+        embed = discord.Embed(color=ctx.author.color)
+        embed.set_author(name=f"The repeat mode has been set to {mode}")
+        embed.set_footer(text=f"Invoked by {ctx.author}")
+        await ctx.send(embed=embed)
 
     @commands.command(name="queue", aliases=["q"])
     async def queue_command(self, ctx, show: t.Optional[int] = 10):
@@ -665,25 +609,18 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="clear")
     @commands.has_role("DJ")
     async def clear_command(self, ctx):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
-        else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
+        player = self.get_player(ctx)
 
-            if player.queue.is_empty:
-                raise QueueIsEmpty
-            player.queue.empty()
-            await player.stop()
-            # await ctx.send("Playback stopped.")
-            embed = discord.Embed(color=ctx.author.color)
-            embed.set_author(
-                name="Queue has been cleared successfully.", icon_url=ctx.author.avatar_url
-            )
-            await ctx.send(embed=embed)
+        if player.queue.is_empty:
+            raise QueueIsEmpty
+        player.queue.empty()
+        await player.stop()
+        # await ctx.send("Playback stopped.")
+        embed = discord.Embed(color=ctx.author.color)
+        embed.set_author(
+            name="Queue has been cleared successfully.", icon_url=ctx.author.avatar_url
+        )
+        await ctx.send(embed=embed)
 
     @clear_command.error
     async def clear_command_error(self, ctx, exc):
@@ -692,28 +629,21 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.group(name="volume", invoke_without_command=True)
     async def volume_group(self, ctx, volume: int):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
-        else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
+        player = self.get_player(ctx)
 
-            if volume < 0:
-                raise VolumeTooLow
+        if volume < 0:
+            raise VolumeTooLow
 
-            if volume > 150:
-                raise VolumeTooHigh
+        if volume > 150:
+            raise VolumeTooHigh
 
-            await player.set_volume(volume)
-            #await ctx.send(f"Volume set to {volume:,}%")
-            embed = discord.Embed(
-                color = discord.Color.green(),
-                description = f"🔊** | Volume set to {volume:,}%**"
-            )
-            await ctx.send(embed=embed)
+        await player.set_volume(volume)
+        #await ctx.send(f"Volume set to {volume:,}%")
+        embed = discord.Embed(
+            color = discord.Color.green(),
+            description = f"🔊** | Volume set to {volume:,}%**"
+        )
+        await ctx.send(embed=embed)
 
     @volume_group.error
     async def volume_group_error(self, ctx, exc):
@@ -724,25 +654,18 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @volume_group.command(name="up")
     async def volume_up_command(self, ctx):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
-        else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
+        player = self.get_player(ctx)
 
-            if player.volume == 150:
-                raise MaxVolume
+        if player.volume == 150:
+            raise MaxVolume
 
-            await player.set_volume(value := min(player.volume + 30, 150))
-            #await ctx.send(f"Volume set to {value:,}%")
-            embed = discord.Embed(
-                color = discord.Color.green(),
-                description = f"🔊** | Volume set to {volume:,}%**"
-            )
-            await ctx.send(embed=embed)
+        await player.set_volume(value := min(player.volume + 30, 150))
+        #await ctx.send(f"Volume set to {value:,}%")
+        embed = discord.Embed(
+            color = discord.Color.green(),
+            description = f"🔊** | Volume set to {volume:,}%**"
+        )
+        await ctx.send(embed=embed)
 
     @volume_up_command.error
     async def volume_up_command_error(self, ctx, exc):
@@ -751,25 +674,18 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @volume_group.command(name="down")
     async def volume_down_command(self, ctx):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
-        else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
+        player = self.get_player(ctx)
 
-            if player.volume == 0:
-                raise MinVolume
+        if player.volume == 0:
+            raise MinVolume
 
-            await player.set_volume(value := max(0, player.volume - 30))
-            #await ctx.send(f"Volume set to {value:,}%")
-            embed = discord.Embed(
-                color = discord.Color.green(),
-                description = f"🔉** | Volume set to {volume:,}%**"
-            )
-            await ctx.send(embed=embed)
+        await player.set_volume(value := max(0, player.volume - 30))
+        #await ctx.send(f"Volume set to {value:,}%")
+        embed = discord.Embed(
+            color = discord.Color.green(),
+            description = f"🔉** | Volume set to {volume:,}%**"
+        )
+        await ctx.send(embed=embed)
 
     @volume_down_command.error
     async def volume_down_command_error(self, ctx, exc):
@@ -808,21 +724,14 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="eq")
     async def eq_command(self, ctx, preset: str):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
-        else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
+        player = self.get_player(ctx)
 
-            eq = getattr(wavelink.eqs.Equalizer, preset, None)
-            if not eq:
-                raise InvalidEQPreset
+        eq = getattr(wavelink.eqs.Equalizer, preset, None)
+        if not eq:
+            raise InvalidEQPreset
 
-            await player.set_eq(eq())
-            await ctx.send(f"Equaliser adjusted to the {preset} preset.")
+        await player.set_eq(eq())
+        await ctx.send(f"Equaliser adjusted to the {preset} preset.")
 
     @eq_command.error
     async def eq_command_error(self, ctx, exc):
@@ -833,30 +742,23 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="adveq", aliases=["aeq"])
     async def adveq_command(self, ctx, band: int, gain: float):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
-        else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
+        player = self.get_player(ctx)
 
-            if not 1 <= band <= 15 and band not in HZ_BANDS:
-                raise NonExistentEQBand
+        if not 1 <= band <= 15 and band not in HZ_BANDS:
+            raise NonExistentEQBand
 
-            if band > 15:
-                band = HZ_BANDS.index(band) + 1
+        if band > 15:
+            band = HZ_BANDS.index(band) + 1
 
-            if abs(gain) > 10:
-                raise EQGainOutOfBounds
+        if abs(gain) > 10:
+            raise EQGainOutOfBounds
 
-            player.eq_levels[band - 1] = gain / 10
-            eq = wavelink.eqs.Equalizer(
-                levels=[(i, gain) for i, gain in enumerate(player.eq_levels)]
-            )
-            await player.set_eq(eq)
-            await ctx.send("Equaliser adjusted.")
+        player.eq_levels[band - 1] = gain / 10
+        eq = wavelink.eqs.Equalizer(
+            levels=[(i, gain) for i, gain in enumerate(player.eq_levels)]
+        )
+        await player.set_eq(eq)
+        await ctx.send("Equaliser adjusted.")
 
     @adveq_command.error
     async def adveq_command_error(self, ctx, exc):
@@ -911,24 +813,17 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="skipto", aliases=["playindex"])
     async def skipto_command(self, ctx, index: int):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
-        else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
+        player = self.get_player(ctx)
 
-            if player.queue.is_empty:
-                raise QueueIsEmpty
+        if player.queue.is_empty:
+            raise QueueIsEmpty
 
-            if not 0 <= index <= player.queue.length:
-                raise NoMoreTracks
+        if not 0 <= index <= player.queue.length:
+            raise NoMoreTracks
 
-            player.queue.position = index - 2
-            await player.stop()
-            await ctx.send(f"Playing track in position {index}.")
+        player.queue.position = index - 2
+        await player.stop()
+        await ctx.send(f"Playing track in position {index}.")
 
     @skipto_command.error
     async def skipto_command_error(self, ctx, exc):
@@ -939,20 +834,13 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="restart")
     async def restart_command(self, ctx):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
-        else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
+        player = self.get_player(ctx)
 
-            if player.queue.is_empty:
-                raise QueueIsEmpty
+        if player.queue.is_empty:
+            raise QueueIsEmpty
 
-            await player.seek(0)
-            await ctx.send("Track restarted.")
+        await player.seek(0)
+        await ctx.send("Track restarted.")
 
     @restart_command.error
     async def restart_command_error(self, ctx, exc):
@@ -961,33 +849,26 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="seek")
     async def seek_command(self, ctx, position: str):
-        bot_member = ctx.guild.get_member(self.bot.user.id)
-        if bot_member.voice.channel is None or ctx.author.voice.channel is None:
-            pass
+        player = self.get_player(ctx)
+
+        if player.queue.is_empty:
+            raise QueueIsEmpty
+
+        if not (match := re.match(TIME_REGEX, position)):
+            raise InvalidTimeString
+
+        if match.group(3):
+            secs = (int(match.group(1)) * 60) + (int(match.group(3)))
         else:
-            if ctx.author.voice.channel != bot_member.voice.channel:
-                await ctx.send("You need to be in the same voice channel as me. :smirk:")
-                return
-            player = self.get_player(ctx)
+            secs = int(match.group(1))
 
-            if player.queue.is_empty:
-                raise QueueIsEmpty
-
-            if not (match := re.match(TIME_REGEX, position)):
-                raise InvalidTimeString
-
-            if match.group(3):
-                secs = (int(match.group(1)) * 60) + (int(match.group(3)))
-            else:
-                secs = int(match.group(1))
-
-            await player.seek(secs * 1000)
-            #await ctx.send("Seeked.")
-            embed = discord.Embed(
-                color=ctx.author.color,
-                description = f"⏩** | Seeked to {position}**"
-            )
-            await ctx.send(embed=embed)
+        await player.seek(secs * 1000)
+        #await ctx.send("Seeked.")
+        embed = discord.Embed(
+            color=ctx.author.color,
+            description = f"⏩** | Seeked to {position}**"
+        )
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
