@@ -575,7 +575,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             embed.add_field(
                 name="Next up",
                 value=f"\n".join(
-                    f"**{t.position}.** {t.title}" for (t) in enumerate(upcoming[:show])
+                    f"**{i+1}.** {t.title}" for (i,t) in enumerate(upcoming[:show])
                 ),
                 inline=False,
             )
