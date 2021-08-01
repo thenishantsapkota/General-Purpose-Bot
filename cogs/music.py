@@ -643,7 +643,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         #await ctx.send(f"Volume set to {volume:,}%")
         embed = discord.Embed(
             color = discord.Color.green(),
-            description = f"🔊| **Volume set to {volume:,}%"
+            description = f"🔊| **Volume set to {volume:,}%**"
         )
         await ctx.send(embed=embed)
 
@@ -665,7 +665,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         #await ctx.send(f"Volume set to {value:,}%")
         embed = discord.Embed(
             color = discord.Color.green(),
-            description = f"🔊| **Volume set to {volume:,}%"
+            description = f"🔊| **Volume set to {volume:,}%**"
         )
         await ctx.send(embed=embed)
 
@@ -685,7 +685,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         #await ctx.send(f"Volume set to {value:,}%")
         embed = discord.Embed(
             color = discord.Color.green(),
-            description = f"🔉| **Volume set to {volume:,}%"
+            description = f"🔉| **Volume set to {volume:,}%**"
         )
         await ctx.send(embed=embed)
 
