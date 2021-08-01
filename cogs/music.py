@@ -575,7 +575,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             embed.add_field(
                 name="Next up",
                 value=f"\n".join(
-                    f"**{i+1}.** {t.title}" for (i, t) in enumerate(upcoming[:show])
+                    f"**{t.position}.** {t.title}" for (t) in enumerate(upcoming[:show])
                 ),
                 inline=False,
             )
@@ -640,7 +640,12 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             raise VolumeTooHigh
 
         await player.set_volume(volume)
-        await ctx.send(f"Volume set to {volume:,}%")
+        #await ctx.send(f"Volume set to {volume:,}%")
+        embed = discord.Embed(
+            color = discord.Color.green(),
+            description = f"🔊| **Volume set to {volume:,}%"
+        )
+        await ctx.send(embed=embed)
 
     @volume_group.error
     async def volume_group_error(self, ctx, exc):
@@ -656,8 +661,13 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         if player.volume == 150:
             raise MaxVolume
 
-        await player.set_volume(value := min(player.volume + 10, 150))
-        await ctx.send(f"Volume set to {value:,}%")
+        await player.set_volume(value := min(player.volume + 30, 150))
+        #await ctx.send(f"Volume set to {value:,}%")
+        embed = discord.Embed(
+            color = discord.Color.green(),
+            description = f"🔊| **Volume set to {volume:,}%"
+        )
+        await ctx.send(embed=embed)
 
     @volume_up_command.error
     async def volume_up_command_error(self, ctx, exc):
@@ -671,8 +681,13 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         if player.volume == 0:
             raise MinVolume
 
-        await player.set_volume(value := max(0, player.volume - 10))
-        await ctx.send(f"Volume set to {value:,}%")
+        await player.set_volume(value := max(0, player.volume - 30))
+        #await ctx.send(f"Volume set to {value:,}%")
+        embed = discord.Embed(
+            color = discord.Color.green(),
+            description = f"🔉| **Volume set to {volume:,}%"
+        )
+        await ctx.send(embed=embed)
 
     @volume_down_command.error
     async def volume_down_command_error(self, ctx, exc):
@@ -767,11 +782,10 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             raise PlayerIsAlreadyPaused
 
         embed = discord.Embed(
-            title="Now playing",
             colour=ctx.author.colour,
             timestamp=dt.datetime.utcnow(),
         )
-        embed.set_author(name="Playback Information")
+        embed.set_author(name="Now playing", icon_url=self.bot.user.avatar_url)
         embed.set_footer(
             text=f"Requested by {ctx.author.display_name}",
             icon_url=ctx.author.avatar_url,
