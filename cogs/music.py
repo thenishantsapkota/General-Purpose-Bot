@@ -780,6 +780,9 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not player.is_playing:
             raise PlayerIsAlreadyPaused
+        
+        position = divmod(player.position, 60000)
+        length = divmod(player.queue.current_track.length, 60000)
 
         embed = discord.Embed(
             colour=ctx.author.colour,
@@ -787,8 +790,6 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             description = f"**Track Title** - {player.queue.current_track.title}\n**Artist** - {player.queue.current_track.author}\n**Position** - {int(position[0])}:{round(position[1]/1000):02}/{int(length[0])}:{round(length[1]/1000):02}"
         )
         embed.set_author(name="Now playing", icon_url=self.bot.user.avatar_url)
-        position = divmod(player.position, 60000)
-        length = divmod(player.queue.current_track.length, 60000)
         embed.set_footer(
             text=f"Requested by {ctx.author.display_name}"
         )
