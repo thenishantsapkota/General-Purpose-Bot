@@ -1,6 +1,6 @@
+import asyncio
 import os
 from pathlib import Path
-import asyncio
 
 import discord
 from discord import Color, Embed
@@ -60,7 +60,9 @@ class Help(Cog):
                     name="Not belonging to a Cog.", value=commands_desc, inline=False
                 )
 
-                embed.add_field(name="About", value=f"This bot is maintained by {owner}")
+                embed.add_field(
+                    name="About", value=f"This bot is maintained by {owner}"
+                )
                 embed.set_footer(text=f"Bot is running Version: {VERSION}")
         elif len(params) == 1:
 
