@@ -784,26 +784,26 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         embed = discord.Embed(
             colour=ctx.author.colour,
             timestamp=dt.datetime.utcnow(),
+            description = f"**Track Title** - {player.queue.current_track.title}\n**Artist** - {player.queue.current_track.author}\n**Position** - {int(position[0])}:{round(position[1]/1000):02}/{int(length[0])}:{round(length[1]/1000):02}"
         )
         embed.set_author(name="Now playing", icon_url=self.bot.user.avatar_url)
-        embed.set_footer(
-            text=f"Requested by {ctx.author.display_name}",
-            icon_url=ctx.author.avatar_url,
-        )
-        embed.add_field(
-            name="Track title", value=player.queue.current_track.title, inline=False
-        )
-        embed.add_field(
-            name="Artist", value=player.queue.current_track.author, inline=False
-        )
-
         position = divmod(player.position, 60000)
         length = divmod(player.queue.current_track.length, 60000)
-        embed.add_field(
-            name="Position",
-            value=f"{int(position[0])}:{round(position[1]/1000):02}/{int(length[0])}:{round(length[1]/1000):02}",
-            inline=False,
+        embed.set_footer(
+            text=f"Requested by {ctx.author.display_name}"
         )
+        # embed.add_field(
+        #     name="Track title", value=player.queue.current_track.title, inline=False
+        # )
+        # embed.add_field(
+        #     name="Artist", value=player.queue.current_track.author, inline=False
+        # )
+
+        # embed.add_field(
+        #     name="Position",
+        #     value=f"{int(position[0])}:{round(position[1]/1000):02}/{int(length[0])}:{round(length[1]/1000):02}",
+        #     inline=False,
+        # )
 
         await ctx.send(embed=embed)
 
