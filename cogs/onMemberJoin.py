@@ -60,7 +60,7 @@ class WelcomeMessage(Cog):
     async def on_member_join(self, member):
         default = "Enjoy your stay here."
         mutedRole = discord.utils.get(member.guild.roles, name="Muted")
-        muteQuery = await MuteModel.get_or_none(guild_id=member.guild.id)
+        muteQuery = await MuteModel.get_or_none(member_id = member.id)
         try:
             if muteQuery.member_id == member.id:
                 await member.edit(roles=[mutedRole])
@@ -87,6 +87,7 @@ class WelcomeMessage(Cog):
                     pass
         except:
             pass
+    
 
 
 def setup(client):
