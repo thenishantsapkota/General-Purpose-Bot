@@ -23,7 +23,7 @@ class Events(Cog):
         for i in self.client.guilds:
             print(f"{i.name}")
             await self.client.change_presence(
-                activity=discord.Game(name="Visual Studio Code")
+                activity=discord.Game(name="Neo Vim")
             )
 
     @command(name="prefix")
