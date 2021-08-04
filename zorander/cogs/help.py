@@ -27,7 +27,7 @@ class Help(Cog):
         self.bot.remove_command("help")
 
     @command()
-    async def help(self, ctx, *params):
+    async def help(self, ctx, *params) -> None:
         model = await GuildModel.get_or_none(guild_id=ctx.guild.id)
         prefix = model.prefix
         if not params:

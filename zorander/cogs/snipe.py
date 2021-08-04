@@ -62,7 +62,7 @@ class Snipe(Cog):
             await ctx.send(embed=embed)
 
     @snipe_group.command(name="edited")
-    async def snipe_edited(self, ctx: commands.Context):
+    async def snipe_edited(self, ctx: commands.Context) -> None:
         try:
             before, after = self.edit_snipes[ctx.channel]
         except KeyError:

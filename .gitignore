@@ -143,3 +143,5 @@ __pycache__/
 aerich.ini
 migrations/
 .vscode/
+CertsID/
+zorander/cogs/send_cert.py

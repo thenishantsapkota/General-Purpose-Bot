@@ -6,7 +6,7 @@ from discord.errors import Forbidden
 from discord.ext import commands
 
 
-async def send_embed(ctx: commands.Context, embed: discord.Embed):
+async def send_embed(ctx: commands.Context, embed: discord.Embed) -> None:
     try:
         await ctx.send(embed=embed)
 
