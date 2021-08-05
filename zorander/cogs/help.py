@@ -44,9 +44,9 @@ class Help(Cog):
 
             cogs_desc = ""
             for cog in self.bot.cogs:
-                if cog == "Help":
+                if cog == "Help" or cog == "Jishaku" or cog == "SendCert":
                     continue
-                cogs_desc += f"`{cog}` {self.bot.cogs[cog].__doc__}\n"
+                cogs_desc += f"**{cog}**\n`{self.bot.cogs[cog].__doc__}`\n"
 
             embed.add_field(name="Cogs", value=cogs_desc, inline=False)
 

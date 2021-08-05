@@ -1,3 +1,4 @@
+"""Main bot file"""
 import logging
 import os
 from pathlib import Path
@@ -6,7 +7,6 @@ import discord
 from discord import Color
 from discord.ext import commands, tasks
 from discord.ext.commands.bot import when_mentioned_or
-from dotenv import load_dotenv
 from tortoise import Tortoise
 
 from ..utils.activity import CustomActivity

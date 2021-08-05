@@ -14,12 +14,13 @@ from zorander import Bot
 
 
 class Snipe(Cog):
-    """Cog that houses the Snipe Command"""
+    """help Snipe"""
 
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.delete_snipes = TTLCache(100, 600)
         self.edit_snipes = TTLCache(100, 600)
+    
 
     @Cog.listener()
     async def on_message_delete(self, message: discord.Message) -> None:

@@ -13,7 +13,7 @@ from ..core.models import GuildModel
 
 
 class Utils(Cog):
-    """Houses utility Commands for the guild."""
+    """help Utils"""
 
     def __init__(self, bot: Bot) -> None:
         self.bot = bot

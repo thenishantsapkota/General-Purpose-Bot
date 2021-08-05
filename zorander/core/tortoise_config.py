@@ -1,3 +1,4 @@
+"""Configuration file for  tortoise-orm"""
 tortoise_config = {
     "connections": {
         "default": {

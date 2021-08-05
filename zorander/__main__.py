@@ -1,3 +1,4 @@
+"""__main__.py"""
 import os
 from pathlib import Path
 
