@@ -27,6 +27,7 @@ class Help(Cog):
         self.bot.remove_command("help")
 
     @command()
+    @commands.guild_only()
     async def help(self, ctx, *params) -> None:
         model = await GuildModel.get_or_none(guild_id=ctx.guild.id)
         prefix = model.prefix
@@ -37,13 +38,13 @@ class Help(Cog):
             except AttributeError:
                 owner = os.getenv("OWNER_NAME")
             embed = discord.Embed(
-                title="Zorander Help",
+                title=f"{self.bot.user.name} - Help",
                 color=self.bot.color,
             )
 
             cogs_desc = ""
             for cog in self.bot.cogs:
-                if cog == "Help" or cog == "Jishaku" or cog == "SendCert":
+                if cog == "Help" or cog == "Jishaku" or cog == "SendCert" or cog == "Errors":
                     continue
                 cogs_desc += f"**{cog}**\n`{self.bot.cogs[cog].__doc__}`\n"
 
