@@ -63,8 +63,8 @@ class Misc(Cog):
         await ctx.send(embed=embed)
 
     @command(name="serverinfo")
-    async def serverinfo_command(self, ctx: commands.Context):
-        """Show various information about the server."""
+    async def serverinfo_command(self, ctx: commands.Context) -> None:
+        """Show information about the server."""
         guild = ctx.guild
 
         desc = dict(ID=guild.id)
@@ -145,7 +145,7 @@ class Misc(Cog):
                 booster.mention,
                 pretty_timedelta(datetime.utcnow() - booster.premium_since),
             )
-        embed.add_field(name="Server boost", value=boost_desc)
+        embed.add_field(name="Server Boost", value=boost_desc)
 
         embed.set_thumbnail(url=guild.icon_url)
         embed.set_footer(text=f"Created | Requested by {ctx.author}")
