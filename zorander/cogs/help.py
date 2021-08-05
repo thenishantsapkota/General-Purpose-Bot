@@ -37,9 +37,8 @@ class Help(Cog):
             except AttributeError:
                 owner = os.getenv("OWNER_NAME")
             embed = discord.Embed(
-                title="Commands and Cogs",
+                title="Zorander Help",
                 color=self.bot.color,
-                description=f"Use `{prefix}help <cog>` to gain more information about that Cog.",
             )
 
             cogs_desc = ""
@@ -48,7 +47,8 @@ class Help(Cog):
                     continue
                 cogs_desc += f"**{cog}**\n`{self.bot.cogs[cog].__doc__}`\n"
 
-            embed.add_field(name="Cogs", value=cogs_desc, inline=False)
+            # embed.add_field(name="\u200b", value=cogs_desc, inline=False)
+            embed.description = f"Use `{prefix}help <cog>` to gain more information about that Cog.\n{cogs_desc}"
 
             commands_desc = ""
             for command in self.bot.walk_commands():
@@ -70,8 +70,7 @@ class Help(Cog):
                 if cog.lower() == params[0].lower():
 
                     embed = discord.Embed(
-                        title=f"{cog} - commands",
-                        description=self.bot.cogs[cog].__doc__,
+                        title=f"{cog} - Commands",
                         color=self.bot.color,
                     )
 
@@ -79,7 +78,7 @@ class Help(Cog):
                         if not command.hidden:
                             embed.add_field(
                                 name=f"{prefix}{command.name}",
-                                value=command.help,
+                                value=f"`{command.help}`",
                                 inline=False,
                             )
                     break

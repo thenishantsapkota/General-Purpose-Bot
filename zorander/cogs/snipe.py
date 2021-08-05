@@ -20,7 +20,6 @@ class Snipe(Cog):
         self.bot = bot
         self.delete_snipes = TTLCache(100, 600)
         self.edit_snipes = TTLCache(100, 600)
-    
 
     @Cog.listener()
     async def on_message_delete(self, message: discord.Message) -> None:

@@ -11,5 +11,6 @@ class GuildModel(Model):
 
     class Meta:
         """Meta class to set table name and description"""
+
         table = "guild"
         table_description = "Stores information about the guild"
