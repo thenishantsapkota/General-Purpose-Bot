@@ -34,7 +34,7 @@ async def get_prefix(client, message):
 
 client = commands.Bot(command_prefix=get_prefix, intents=intents)
 client.load_extension("jishaku")
-client.owner_ids = ["852617608309112882"]
+client.owner_id = 852617608309112882
 for filename in os.listdir("./cogs"):
     if filename.endswith(".py"):
         client.load_extension(f"cogs.{filename[:-3]}")
