@@ -14,10 +14,12 @@ from ..utils.time import pretty_datetime, pretty_seconds, pretty_timedelta
 
 
 class Misc(Cog):
+    """help Misc"""
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
     @command(name="whois")
+    @commands.guild_only()
     async def whois_command(
         self, ctx: commands.Context, member: Optional[Member]
     ) -> None:
@@ -63,6 +65,7 @@ class Misc(Cog):
         await ctx.send(embed=embed)
 
     @command(name="serverinfo")
+    @commands.guild_only()
     async def serverinfo_command(self, ctx: commands.Context) -> None:
         """Show information about the server."""
         guild = ctx.guild
@@ -148,7 +151,7 @@ class Misc(Cog):
         embed.add_field(name="Server Boost", value=boost_desc)
 
         embed.set_thumbnail(url=guild.icon_url)
-        embed.set_footer(text=f"Created | Requested by {ctx.author}")
+        embed.set_footer(text=f"Requested by {ctx.author}")
 
         await ctx.send(embed=embed)
 
