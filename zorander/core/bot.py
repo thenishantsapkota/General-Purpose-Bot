@@ -1,4 +1,6 @@
-"""Main bot file"""
+"""
+This is the main file for running the Bot
+"""
 import logging
 import os
 from pathlib import Path
