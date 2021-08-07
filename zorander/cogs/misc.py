@@ -14,7 +14,7 @@ from ..utils.time import pretty_datetime, pretty_seconds, pretty_timedelta
 
 
 class Misc(Cog):
-    """help Misc"""
+
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
@@ -78,7 +78,7 @@ class Misc(Cog):
                 "**{}**: {}".format(key, value) for key, value in desc.items()
             ),
             timestamp=guild.created_at,
-            color = self.bot.color
+            color=self.bot.color,
         )
         embed.add_field(
             name="Owner",

@@ -13,7 +13,6 @@ from ..core.models import GuildModel
 
 
 class Utils(Cog):
-    """help Utils"""
 
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
@@ -22,6 +21,7 @@ class Utils(Cog):
     @command(
         name="changeprefix", aliases=["chp"], brief="Change the prefix of the server."
     )
+    @commands.has_permissions(administrator=True)
     async def changeprefix(self, ctx: commands.Context, prefix: str) -> None:
         """Change the prefix of the server."""
         model = await GuildModel.get_or_none(guild_id=ctx.guild.id)

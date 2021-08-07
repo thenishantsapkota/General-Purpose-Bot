@@ -1,108 +1,103 @@
-import asyncio
-import os
-from pathlib import Path
-
 import discord
-from discord import Color, Embed
 from discord.ext import commands
-from discord.ext.commands import Cog, command
-from dotenv import load_dotenv
-
 from zorander import Bot
 
-from ..core.models import GuildModel
-from ..utils.utilities import send_embed
-
-env_path = Path(".") / ".env"
-load_dotenv(dotenv_path=env_path)
+bot_links = """[Support](https://discord.gg/itsnporg)\u2800\
+[GitHub](https://github.com/thenishantsapkota\General-Purpose-Bot)\u2800\
+[Suggestions](https://github.com/thenishantsapkota/General-Purpose-Bot/issues)"""
 
 
-VERSION = os.getenv("VERSION")
-EMOJI = "<:pansweat:858239084363644938>"
+class HelpCommand(commands.HelpCommand):
+    """
+    An Embed help command
+    """
 
+    COLOUR = discord.Colour.teal()
 
-class Help(Cog):
-    def __init__(self, bot: Bot) -> None:
-        self.bot = bot
-        self.bot.remove_command("help")
+    def get_ending_note(self):
+        return "Use {0}{1} [command] for more info on a command.".format(
+            self.clean_prefix, self.invoked_with
+        )
 
-    @command()
-    @commands.guild_only()
-    async def help(self, ctx, *params) -> None:
-        model = await GuildModel.get_or_none(guild_id=ctx.guild.id)
-        prefix = model.prefix
-        if not params:
-            try:
-                owner = ctx.guild.get_member(os.getenv("OWNER_ID")).mention
+    def get_command_signature(self, command):
+        return "{0.qualified_name} {0.signature}".format(command)
 
-            except AttributeError:
-                owner = os.getenv("OWNER_NAME")
-            embed = discord.Embed(
-                title=f"{self.bot.user.name} - Help",
-                color=self.bot.color,
+    async def send_bot_help(self, mapping):
+        embed = discord.Embed(title=f"Help Command", colour=self.COLOUR)
+        description = self.context.bot.description
+        if description:
+            embed.description = description
+
+        for cog, cmds in mapping.items():
+            if cog is None:
+                continue
+            name = cog.qualified_name
+            filtered = await self.filter_commands(cmds, sort=True)
+            if filtered:
+                value = "\u2002".join(f"`{c.name}`" for c in cmds)
+                if cog and cog.description:
+                    value = "{0}\n{1}".format(cog.description, value)
+
+                embed.add_field(name=name, value=value)
+
+        embed.set_footer(text=self.get_ending_note())
+        self.add_support_server(embed)
+        await self.get_destination().send(embed=embed)
+
+    async def send_cog_help(self, cog):
+        embed = discord.Embed(
+            title="{0.qualified_name} Commands".format(cog), colour=self.COLOUR
+        )
+        if cog.description:
+            embed.description = cog.description
+
+        filtered = await self.filter_commands(cog.get_commands(), sort=True)
+        for command in filtered:
+            embed.add_field(
+                name=command.qualified_name,
+                value=command.short_doc or "...",
+                inline=False,
             )
 
-            cogs_desc = ""
-            for cog in self.bot.cogs:
-                if cog == "Help" or cog == "Jishaku" or cog == "SendCert" or cog == "Errors":
-                    continue
-                cogs_desc += f"**{cog}**\n`{self.bot.cogs[cog].__doc__}`\n"
+        embed.set_footer(text=self.get_ending_note())
+        self.add_support_server(embed)
+        await self.get_destination().send(embed=embed)
 
-            # embed.add_field(name="\u200b", value=cogs_desc, inline=False)
-            embed.description = f"Use `{prefix}help <cog>` to gain more information about that Cog.\n{cogs_desc}"
+    async def send_group_help(self, group):
+        embed = discord.Embed(title=group.qualified_name, colour=self.COLOUR)
+        if group.help:
+            embed.description = group.help
 
-            commands_desc = ""
-            for command in self.bot.walk_commands():
-                if not command.cog_name and not command.hidden:
-                    commands_desc += f"{command.name} - {command.help}\n"
-
-            if commands_desc:
-                embed.add_field(
-                    name="Not belonging to a Cog.", value=commands_desc, inline=False
-                )
-
-                embed.add_field(
-                    name="About", value=f"This bot is maintained by {owner}"
-                )
-                embed.set_footer(text=f"Bot is running Version: {VERSION}")
-        elif len(params) == 1:
-
-            for cog in self.bot.cogs:
-                if cog.lower() == params[0].lower():
-
-                    embed = discord.Embed(
-                        title=f"{cog} - Commands",
-                        color=self.bot.color,
-                    )
-
-                    for command in self.bot.get_cog(cog).get_commands():
-                        if not command.hidden:
-                            embed.add_field(
-                                name=f"{prefix}{command.name}",
-                                value=f"`{command.help}`",
-                                inline=False,
-                            )
-                    break
-
-            else:
-                embed = discord.Embed(
-                    title=f"Uh Oh?! {EMOJI}",
-                    description=f"I've never heard of a cog called `{params[0]}` before.",
-                    color=Color.orange(),
-                )
-
-        elif len(params) > 1:
-            embed = discord.Embed(
-                title=f"Uhhhh {EMOJI}",
-                description=f"Looks like you passed me more arguments than I actually needed.",
-                color=Color.orange(),
+        filtered = await self.filter_commands(group.commands, sort=True)
+        for command in filtered:
+            embed.add_field(
+                name=command.qualified_name,
+                value=command.short_doc or "...",
+                inline=False,
             )
 
-        else:
-            pass
+        embed.set_footer(text=self.get_ending_note())
+        self.add_support_server(embed)
+        await self.get_destination().send(embed=embed)
 
-        await send_embed(ctx, embed)
+    def add_support_server(self, embed):
+        return embed.add_field(name="Links", value=bot_links, inline=False)
+
+    async def send_command_help(self, command):
+        embed = discord.Embed(title=command.qualified_name, colour=self.COLOUR)
+        embed.add_field(name="Signature", value=self.get_command_signature(command))
+        if command.help:
+            embed.description = command.help
+
+        embed.set_footer(text=self.get_ending_note())
+        self.add_support_server(embed)
+        await self.get_destination().send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
-    bot.add_cog(Help(bot))
+def setup(bot: commands.Bot):
+    bot._default_help_command = bot.help_command
+    bot.help_command = HelpCommand()
+
+
+def teardown(bot):
+    bot.help_command = bot._default_help_command

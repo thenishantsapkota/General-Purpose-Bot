@@ -144,4 +144,5 @@ aerich.ini
 migrations/
 .vscode/
 CertsID/
-zorander/cogs/send_cert.py
+zorander/cogs/send_cert.py.bak
+help.py.bak

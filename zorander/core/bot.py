@@ -17,6 +17,7 @@ from ..utils.cogreload import CogsReload
 from .models import GuildModel
 from .tortoise_config import tortoise_config
 
+
 os.environ.setdefault("JISHAKU_HIDE", "1")
 os.environ.setdefault("JISHAKU_RETAIN", "1")
 os.environ.setdefault("JISHAKU_NO_UNDERSCORE", "1")
@@ -46,6 +47,7 @@ class Bot(commands.Bot):
         data, _ = await GuildModel.get_or_create(guild_id=message.guild.id)
         prefix = data.prefix
         return when_mentioned_or(prefix)(bot, message)
+
 
     @tasks.loop(seconds=0, count=1)
     async def connect_db(self) -> None:

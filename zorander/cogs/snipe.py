@@ -14,7 +14,6 @@ from zorander import Bot
 
 
 class Snipe(Cog):
-    """help Snipe"""
 
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
