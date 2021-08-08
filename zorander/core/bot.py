@@ -16,6 +16,8 @@ from ..utils.cogload import CogsLoad
 from ..utils.cogreload import CogsReload
 from .models import GuildModel
 from .tortoise_config import tortoise_config
+from discord.http import HTTPClient
+from aiohttp import ClientSession
 
 
 os.environ.setdefault("JISHAKU_HIDE", "1")
@@ -28,6 +30,7 @@ logging.basicConfig(level=logging.INFO)
 
 class Bot(commands.Bot):
     """Custom class for creating a bot instance"""
+    http: HTTPClient
 
     def __init__(self) -> None:
         self._cogs = [p.stem for p in Path("./zorander/cogs/").glob("*.py")]
@@ -35,6 +38,7 @@ class Bot(commands.Bot):
         self.reloader = CogsReload(self)
         self.loader = CogsLoad(self)
         self.custom_activity = CustomActivity(self)
+        self.owner_id = 852617608309112882
         super().__init__(
             command_prefix=self._get_prefix,
             intents=discord.Intents.all(),
@@ -48,6 +52,10 @@ class Bot(commands.Bot):
         prefix = data.prefix
         return when_mentioned_or(prefix)(bot, message)
 
+    @property
+    def session(self) -> ClientSession:
+        return self.http._HTTPClient__session  # type: ignore
+
 
     @tasks.loop(seconds=0, count=1)
     async def connect_db(self) -> None:
@@ -60,6 +68,9 @@ class Bot(commands.Bot):
         logger.info("Started Cog Reloader.")
         await self.loader.cog_load()
         logger.info("Bot is ready!")
+
+        for i in self.guilds:
+            logger.info(f"Server Name: {i.name}, Members: {i.member_count}")
 
         self.connect_db.start()
         logger.info(f"Logged in as {self.user}")
