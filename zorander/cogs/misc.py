@@ -2,23 +2,29 @@ from datetime import datetime
 from typing import Optional
 
 import discord
+import os
 from cachetools import TTLCache
 from discord import Embed, Member
 from discord.channel import VoiceChannel
 from discord.ext import commands
 from discord.ext.commands import Cog, command
+from snowflakeapi import SnowClient
 
 from zorander import Bot
+import logging
 
 from ..utils.time import pretty_datetime, pretty_seconds, pretty_timedelta
+
 
 
 class Misc(Cog):
 
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
+        self.client = SnowClient(os.environ.get("SNOWFLAKE_API_KEY"))
 
     @command(name="whois")
+    @commands.has_permissions(administrator=True, manage_channels=True, kick_members=True, manage_guild=True)
     @commands.guild_only()
     async def whois_command(
         self, ctx: commands.Context, member: Optional[Member]
@@ -154,7 +160,51 @@ class Misc(Cog):
         embed.set_footer(text=f"Requested by {ctx.author}")
 
         await ctx.send(embed=embed)
+    
+    @command(name="pypi")
+    @commands.guild_only()
+    async def pypi_command(self, ctx: commands.Context, module_name:str) -> None:
+        data = await self.client.pypi(module_name)
+        module = data["module"]
+        module_name = module["name"]
+        module_description = module["description"]
+        module_url = module["url"]
+        module_version = module["version"]
+        module_author = module["author"]
+        registry = data["registry"]
 
+        embed = Embed(
+            color = self.bot.color,
+            timestamp = datetime.utcnow(),
+            description = f"**Module Name** - {module_name}\n**Description** - {module_description}\n**URL** - {module_url}\n**Version** - {module_version}\n**Author** - {module_author}"
+        )
+        embed.set_thumbnail(url=str(data["icon"]))
+        embed.set_footer(text=f"Requested by {ctx.author}")
+        embed.set_author(name=f"Info of {module_name} - {registry}")
+        await ctx.send(embed=embed)
+    
+    @command(name="npm")
+    @commands.guild_only()
+    async def npm_command(self, ctx:commands.Context,module_name:str) -> None:
+        data = await self.client.npm(module_name)
+        registry = data["registry"]
+        icon = data["icon"]
+        module = data["module"]
+        module_description = module["description"]
+        module_name = module["name"]
+        module_version = module["version"]
+        module_author = module["author"]
+        module_url = module["url"]
+
+        embed = Embed(
+            color = self.bot.color,
+            timestamp = datetime.utcnow(),
+            description = f"**Module Name** - {module_name}\n**Description** - {module_description}\n**URL** - {module_url}\n**Version** - {module_version}\n**Author** - {module_author}"
+        )
+        embed.set_thumbnail(url=str(icon))
+        embed.set_footer(text=f"Requested by {ctx.author}")
+        embed.set_author(name=f"Info of {module_name} - {registry}")
+        await ctx.send(embed=embed)
 
 def setup(bot: Bot) -> None:
     bot.add_cog(Misc(bot))
