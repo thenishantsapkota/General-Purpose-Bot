@@ -15,15 +15,15 @@ class CustomActivity:
             [
                 lambda: discord.Activity(
                     type=discord.ActivityType.watching,
-                    name=f"Your Dark Future <3",
+                    name=f">help | Use help to get help.",
                 ),
                 lambda: discord.Activity(
                     type=discord.ActivityType.listening,
-                    name=f"Samrid is Baun.",
+                    name=f"{len(self.bot.guilds)} guilds.",
                 ),
                 lambda: discord.Activity(
                     type=discord.ActivityType.watching,
-                    name=f"Why are you gae.",
+                    name=f"Fun commands and much more.",
                 ),
             ]
         )
