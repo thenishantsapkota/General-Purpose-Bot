@@ -6,9 +6,11 @@ import os
 from pathlib import Path
 
 import discord
+from aiohttp import ClientSession
 from discord import Color
 from discord.ext import commands, tasks
 from discord.ext.commands.bot import when_mentioned_or
+from discord.http import HTTPClient
 from tortoise import Tortoise
 
 from ..utils.activity import CustomActivity
@@ -16,9 +18,6 @@ from ..utils.cogload import CogsLoad
 from ..utils.cogreload import CogsReload
 from .models import GuildModel
 from .tortoise_config import tortoise_config
-from discord.http import HTTPClient
-from aiohttp import ClientSession
-
 
 os.environ.setdefault("JISHAKU_HIDE", "1")
 os.environ.setdefault("JISHAKU_RETAIN", "1")
@@ -30,6 +29,7 @@ logging.basicConfig(level=logging.INFO)
 
 class Bot(commands.Bot):
     """Custom class for creating a bot instance"""
+
     http: HTTPClient
 
     def __init__(self) -> None:
@@ -55,7 +55,6 @@ class Bot(commands.Bot):
     @property
     def session(self) -> ClientSession:
         return self.http._HTTPClient__session  # type: ignore
-
 
     @tasks.loop(seconds=0, count=1)
     async def connect_db(self) -> None:

@@ -15,13 +15,13 @@ class GuildModel(Model):
         table = "guild"
         table_description = "Stores information about the guild"
 
+
 class MusicModel(Model):
     """Defining a Music Model"""
+
     guild_id = fields.BigIntField(pk=True)
     channel_id = fields.BigIntField()
 
     class Meta:
         table = "music"
         table_description = "Stores information about Music Cog"
-
-

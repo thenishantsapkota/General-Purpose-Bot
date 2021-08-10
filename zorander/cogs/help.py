@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+
 from zorander import Bot
 
 bot_links = """[Support](https://discord.gg/itsnporg)\u2800\
@@ -92,7 +93,7 @@ class HelpCommand(commands.HelpCommand):
         embed.set_footer(text=self.get_ending_note())
         self.add_support_server(embed)
         await self.get_destination().send(embed=embed)
-    
+
     async def send_help(self, command):
         embed = discord.Embed(title=command.qualified_name, colour=self.COLOUR)
         embed.add_field(name="Signature", value=self.get_command_signature(command))

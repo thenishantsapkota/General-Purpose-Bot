@@ -14,7 +14,6 @@ from zorander import Bot
 
 
 class Snipe(Cog):
-
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.delete_snipes = TTLCache(100, 600)

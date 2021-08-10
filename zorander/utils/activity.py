@@ -25,11 +25,9 @@ class CustomActivity:
                     type=discord.ActivityType.watching,
                     name=f"Fun commands and much more.",
                 ),
-                
                 lambda: discord.Activity(
-                    type = discord.ActivityType.playing,
-                    name=f"Neo Vim | Coding Myself"
-                )
+                    type=discord.ActivityType.playing, name=f"Neo Vim | Coding Myself"
+                ),
             ]
         )
         self.change_presence.start()
