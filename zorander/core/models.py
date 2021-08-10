@@ -16,12 +16,14 @@ class GuildModel(Model):
         table_description = "Stores information about the guild"
 
 
-class MusicModel(Model):
-    """Defining a Music Model"""
-
-    guild_id = fields.BigIntField(pk=True)
-    channel_id = fields.BigIntField()
+class ModerationRoles(Model):
+    """Defining a moderation roles model"""
+    id = fields.IntField(pk=True)
+    admin_role = fields.BigIntField()
+    mod_role = fields.BigIntField()
+    staff_role = fields.BigIntField()
+    guild_id = fields.BigIntField()
 
     class Meta:
-        table = "music"
-        table_description = "Stores information about Music Cog"
+        table = "staffroles"
+        table_description = "Stores StaffRoles of the server"
