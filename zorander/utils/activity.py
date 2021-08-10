@@ -15,7 +15,7 @@ class CustomActivity:
             [
                 lambda: discord.Activity(
                     type=discord.ActivityType.watching,
-                    name=f">help | Use help to get help.",
+                    name=f">help | Use >help to get help.",
                 ),
                 lambda: discord.Activity(
                     type=discord.ActivityType.watching,

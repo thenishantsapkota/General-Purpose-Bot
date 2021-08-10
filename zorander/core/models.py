@@ -18,6 +18,7 @@ class GuildModel(Model):
 
 class ModerationRoles(Model):
     """Defining a moderation roles model"""
+
     id = fields.IntField(pk=True)
     admin_role = fields.BigIntField()
     mod_role = fields.BigIntField()

@@ -1,5 +1,6 @@
 import logging
 import math
+import re
 import sys
 import traceback
 
@@ -103,13 +104,16 @@ class Errors(Cog):
                 pass
             return
 
-        if isinstance(error, commands.CheckFailure):
-            await ctx.reply("You do not have permission to use this command.")
-            return
-
-        logging.info("Ignoring exception in command {}:".format(ctx.command))
-
-        traceback.print_exception(type(error), error, error.__traceback__)
+        else:
+            title = " ".join(
+                re.compile(r"[A-Z][a-z]*").findall(error.__class__.__name__)
+            )
+            await ctx.reply(
+                embed=discord.Embed(
+                    title=title, description=str(error), color=Color.red()
+                )
+            )
+            raise error
 
 
 def setup(bot: Bot) -> None:

@@ -15,18 +15,15 @@ class SetModerationRoles(commands.CommandError):
 
 
 class Permissions:
-
     async def has_permissions(self, member: Member, permission: str):
         if getattr(member.guild_permissions, permission, False):
             return True
         return False
 
-
     async def rolecheck(self, member: Member, role: Role):
         if role in member.roles:
             return True
         return False
-
 
     async def fetch_role_data(self, guild: Guild):
         model = await ModerationRoles.get_or_none(guild_id=guild.id)
@@ -65,6 +62,3 @@ class Permissions:
             raise NotEnoughPermissions(
                 "You don't have either the roles required or the permissions."
             )
-    
-        
-
