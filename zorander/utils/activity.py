@@ -18,13 +18,18 @@ class CustomActivity:
                     name=f">help | Use help to get help.",
                 ),
                 lambda: discord.Activity(
-                    type=discord.ActivityType.listening,
+                    type=discord.ActivityType.watching,
                     name=f"{len(self.bot.guilds)} guilds.",
                 ),
                 lambda: discord.Activity(
                     type=discord.ActivityType.watching,
                     name=f"Fun commands and much more.",
                 ),
+                
+                lambda: discord.Activity(
+                    type = discord.ActivityType.playing,
+                    name=f"Neo Vim | Coding Myself"
+                )
             ]
         )
         self.change_presence.start()

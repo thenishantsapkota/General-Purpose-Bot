@@ -46,7 +46,6 @@ class Errors(Cog):
             await ctx.reply(embed=embed)
 
         if isinstance(error, commands.DisabledCommand):
-            # await ctx.reply('This command has been disabled.')
             embed = Embed(
                 title="Disabled Command",
                 color=Color.red(),
@@ -56,7 +55,6 @@ class Errors(Cog):
             return
 
         if isinstance(error, commands.CommandOnCooldown):
-            # await ctx.reply("This command is on cooldown, please retry in {}s.".format(math.ceil(error.retry_after)))
             embed = Embed(
                 title="Command on Cooldown",
                 color=Color.red(),
@@ -83,12 +81,13 @@ class Errors(Cog):
                 description=_message,
             )
             await ctx.reply(embed=embed)
-            # await ctx.reply(_message)
             return
 
         if isinstance(error, commands.UserInputError):
-            await ctx.reply("Invalid input.")
-            # await self.reply(ctx)
+            e = await self.bot.help_command.send_help(ctx.command)
+            e.set_footer(text=f"Invoked by {ctx.author} | Missing Required Arguments")
+            await ctx.send(embed=e)
+            
             return
 
         if isinstance(error, commands.NoPrivateMessage):
@@ -108,7 +107,6 @@ class Errors(Cog):
             await ctx.reply("You do not have permission to use this command.")
             return
 
-        # ignore all other exception types, but print them to stderr
         logging.info("Ignoring exception in command {}:".format(ctx.command))
 
         traceback.print_exception(type(error), error, error.__traceback__)

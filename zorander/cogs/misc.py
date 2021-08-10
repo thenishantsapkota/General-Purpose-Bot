@@ -154,6 +154,7 @@ class Misc(Cog):
                 booster.mention,
                 pretty_timedelta(datetime.utcnow() - booster.premium_since),
             )
+        # ignore all other exception types, but print them to stderr
         embed.add_field(name="Server Boost", value=boost_desc)
 
         embed.set_thumbnail(url=guild.icon_url)
