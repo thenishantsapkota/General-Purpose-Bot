@@ -28,3 +28,14 @@ class ModerationRoles(Model):
     class Meta:
         table = "staffroles"
         table_description = "Stores StaffRoles of the server"
+
+class MuteModel(Model):
+    id = fields.IntField(pk=True)
+    member_id = fields.BigIntField()
+    guild_id = fields.BigIntField()
+    time = fields.DatetimeField()  
+    role_id = fields.TextField() 
+
+    class Meta:
+        table = "mutes"
+        table_description = "Stores Per Guild Mute Data"
