@@ -20,9 +20,9 @@ class ModerationRoles(Model):
     """Defining a moderation roles model to store moderation roles for the server"""
 
     id = fields.IntField(pk=True)
-    admin_role = fields.BigIntField()
-    mod_role = fields.BigIntField()
-    staff_role = fields.BigIntField()
+    admin_role = fields.BigIntField(null=True)
+    mod_role = fields.BigIntField(null=True)
+    staff_role = fields.BigIntField(null=True)
     guild_id = fields.BigIntField()
 
     class Meta:

@@ -154,7 +154,7 @@ class Mod(Cog):
                 await log_channel.send(embed=embed)
                 await ctx.send(f":loud_sound: Unmuted `{member.name}`.")
             else:
-                PartialMessage
+                pass
 
 
 def setup(bot: Bot) -> None:
