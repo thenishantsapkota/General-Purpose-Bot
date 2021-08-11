@@ -1,6 +1,6 @@
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 import discord
@@ -10,6 +10,7 @@ from discord.channel import VoiceChannel
 from discord.ext import commands
 from discord.ext.commands import Cog, command
 from snowflakeapi import SnowClient
+
 
 from zorander import Bot
 
@@ -21,10 +22,20 @@ class Misc(Cog):
         self.bot = bot
         self.client = SnowClient(os.environ.get("SNOWFLAKE_API_KEY"))
 
+    @command()
+    async def ping(self, ctx):
+        """Check the response time of the bot."""
+        embed = Embed(
+            title = "Pinging the API...."
+        )
+        msg = await ctx.send(embed = embed)
+        ping_embed = Embed(
+            title = "Ping",
+             description = f"Response: {pretty_timedelta(msg.created_at - ctx.message.created_at)}\nGateway: {pretty_timedelta(timedelta(seconds=self.bot.latency))}"
+        )
+        await msg.edit(embed = ping_embed)
+
     @command(name="whois")
-    @commands.has_permissions(
-        administrator=True, manage_channels=True, kick_members=True, manage_guild=True
-    )
     @commands.guild_only()
     async def whois_command(
         self, ctx: commands.Context, member: Optional[Member]
@@ -43,7 +54,16 @@ class Misc(Cog):
         embed.add_field(name="Status", value=str(member.status).title())
 
         if member.activity:
-            embed.add_field(name="Activity", value=member.activity.name)
+            activities = []
+            for activity in member.activities:
+                activities.append(activity.name)
+        activity_list = "\n".join(
+            [
+                f"{i+1}. {activity_name}"
+                for (i, activity_name) in enumerate(activities)
+            ]
+        )
+        embed.add_field(name="Activity", value=activity_list)
 
         now = datetime.now()
         created_at = member.created_at
