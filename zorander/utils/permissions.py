@@ -1,3 +1,4 @@
+"""Module that helps in setting up moderation roles for the server."""
 import discord
 from discord import Guild, Member, Role
 from discord.ext import commands
@@ -7,14 +8,17 @@ from zorander.core.models import ModerationRoles
 
 
 class NotEnoughPermissions(commands.CommandError):
+    """Class that raises errors when there is not enough permissions."""
     pass
 
 
 class SetModerationRoles(commands.CommandError):
+    """Class that raises errors when moderation roles are not setup"""
     pass
 
 
 class Permissions:
+    """Custom class for setting guild perms."""
     async def has_permissions(self, member: Member, permission: str):
         if getattr(member.guild_permissions, permission, False):
             return True
