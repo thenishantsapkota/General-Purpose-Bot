@@ -27,21 +27,26 @@ class ModerationRoles(Model):
 
     class Meta:
         """Meta class to set table name and description"""
+
         table = "staffroles"
         table_description = "Stores StaffRoles of the server"
 
+
 class MuteModel(Model):
     """Defining a Mute model to store mutes"""
+
     id = fields.IntField(pk=True)
     member_id = fields.BigIntField()
     guild_id = fields.BigIntField()
-    time = fields.DatetimeField()  
-    role_id = fields.TextField() 
+    time = fields.DatetimeField()
+    role_id = fields.TextField()
 
     class Meta:
         """Meta class to set table name and description"""
+
         table = "mutes"
         table_description = "Stores Per Guild Mute Data"
+
 
 class WarnModel(Model):
     "Defining a warn model to store warns"
@@ -52,5 +57,6 @@ class WarnModel(Model):
 
     class Meta:
         """Meta class to set table name and description"""
+
         table = "warnings"
         table_description = "Stores Per Guild Warnings"
