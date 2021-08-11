@@ -10,6 +10,7 @@ from discord.ext.commands import Cog, command
 
 from zorander import Bot
 from zorander.core.models import MuteModel, ModerationRoles
+from zorander.cogs.errors import MessageNotRefrenced
 
 from ..core.models import GuildModel
 
@@ -18,6 +19,7 @@ class Utils(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.bot.sniped_messages = {}
+        self.message_not_referenced = MessageNotRefrenced()
 
     @command(
         name="changeprefix", aliases=["chp"], brief="Change the prefix of the server."
@@ -173,6 +175,19 @@ class Utils(Cog):
         embed.set_footer(text=f"Invoked by {author}")
         await ctx.send(embed=embed)
 
+    @command(name="re")
+    async def repeat_command(self, ctx: commands.Context):
+        """Reply to a message to redo the command"""
+        reference = ctx.message.reference
+        if not reference:
+            raise self.message_not_referenced
+        try:
+            message = await ctx.channel.fetch_message(reference.message_id)
+        except discord.NotFound:
+            return await ctx.reply("Couldn't find that message")
+        if message.author != ctx.author:
+            return
+        await self.bot.process_commands(message)
 
 def setup(bot: Bot) -> None:
     bot.add_cog(Utils(bot))
