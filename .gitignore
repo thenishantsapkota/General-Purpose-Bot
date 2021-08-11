@@ -146,4 +146,3 @@ migrations/
 CertsID/
 zorander/cogs/send_cert.py.bak
 help.py.bak
-mod.py
