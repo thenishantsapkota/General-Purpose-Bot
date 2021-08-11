@@ -11,7 +11,6 @@ from discord.ext import commands
 from discord.ext.commands import Cog, command
 from snowflakeapi import SnowClient
 
-
 from zorander import Bot
 
 from ..utils.time import pretty_datetime, pretty_seconds, pretty_timedelta
@@ -25,15 +24,13 @@ class Misc(Cog):
     @command()
     async def ping(self, ctx):
         """Check the response time of the bot."""
-        embed = Embed(
-            title = "Pinging the API...."
-        )
-        msg = await ctx.send(embed = embed)
+        embed = Embed(title="Pinging the API....")
+        msg = await ctx.send(embed=embed)
         ping_embed = Embed(
-            title = "Ping",
-             description = f"Response: {pretty_timedelta(msg.created_at - ctx.message.created_at)}\nGateway: {pretty_timedelta(timedelta(seconds=self.bot.latency))}"
+            title="Ping",
+            description=f"Response: {pretty_timedelta(msg.created_at - ctx.message.created_at)}\nGateway: {pretty_timedelta(timedelta(seconds=self.bot.latency))}",
         )
-        await msg.edit(embed = ping_embed)
+        await msg.edit(embed=ping_embed)
 
     @command(name="whois")
     @commands.guild_only()
@@ -58,10 +55,7 @@ class Misc(Cog):
             for activity in member.activities:
                 activities.append(activity.name)
         activity_list = "\n".join(
-            [
-                f"{i+1}. {activity_name}"
-                for (i, activity_name) in enumerate(activities)
-            ]
+            [f"{i+1}. {activity_name}" for (i, activity_name) in enumerate(activities)]
         )
         embed.add_field(name="Activity", value=activity_list)
 

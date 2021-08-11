@@ -9,8 +9,8 @@ from discord.ext import commands
 from discord.ext.commands import Cog, command
 
 from zorander import Bot
-from zorander.core.models import MuteModel, ModerationRoles
 from zorander.cogs.errors import MessageNotRefrenced
+from zorander.core.models import ModerationRoles, MuteModel
 
 from ..core.models import GuildModel
 
@@ -188,6 +188,7 @@ class Utils(Cog):
         if message.author != ctx.author:
             return
         await self.bot.process_commands(message)
+
 
 def setup(bot: Bot) -> None:
     bot.add_cog(Utils(bot))
