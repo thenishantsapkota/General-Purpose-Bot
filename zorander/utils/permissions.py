@@ -1,6 +1,6 @@
 """Module that helps in setting up moderation roles for the server."""
 import discord
-from discord import Guild, Member, Role
+from discord import Guild, Member, Role, TextChannel
 from discord.ext import commands
 from discord.ext.commands.context import Context
 
@@ -22,7 +22,7 @@ class SetModerationRoles(commands.CommandError):
 class Permissions:
     """Custom class for setting guild perms."""
 
-    async def has_permissions(self, member: Member, permission: str):
+    async def has_permissions(self, member: Member, permission: str) -> bool:
         if getattr(member.guild_permissions, permission, False):
             return True
         return False
@@ -32,7 +32,7 @@ class Permissions:
             return True
         return False
 
-    async def fetch_role_data(self, guild: Guild):
+    async def fetch_role_data(self, guild: Guild) -> dict:
         model = await ModerationRoles.get_or_none(guild_id=guild.id)
         if model is None:
             raise SetModerationRoles(
@@ -69,3 +69,25 @@ class Permissions:
             raise NotEnoughPermissions(
                 "You don't have either the roles required or the permissions."
             )
+
+    async def log_channel_check(self, guild: Guild) -> TextChannel:
+        log_channel = discord.utils.get(guild.text_channels, name="mod-logs")
+        if log_channel is None:
+            log_channel = await guild.create_text_channel("mod-logs")
+            await log_channel.set_permissions(
+                guild.default_role, view_channel=False, send_messages=False
+            )
+        return log_channel
+
+    async def muted_role_check(self, guild: Guild) -> Role:
+        muted_role = discord.utils.get(guild.roles, name="Muted")
+        if muted_role is None:
+            muted_role = await guild.create_role(name="Muted")
+            for channel in guild.channels:
+                await channel.set_permissions(
+                    muted_role,
+                    speak=False,
+                    send_messages=False,
+                    read_message_history=True,
+                )
+        return muted_role
