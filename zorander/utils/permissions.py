@@ -27,7 +27,7 @@ class Permissions:
             return True
         return False
 
-    async def rolecheck(self, member: Member, role: Role):
+    async def rolecheck(self, member: Member, role: Role) -> bool:
         if role in member.roles:
             return True
         return False
@@ -50,7 +50,7 @@ class Permissions:
         }
         return roles
 
-    async def staff_role_check(self, ctx: Context, guild: Guild):
+    async def staff_role_check(self, ctx: Context, guild: Guild) -> None:
         staffrole = (await self.fetch_role_data(guild)).get("staffrole")
         if not (
             await self.has_permissions(ctx.author, "manage_messages")
@@ -60,7 +60,7 @@ class Permissions:
                 "You don't have either the roles required or the permissions to run this command."
             )
 
-    async def mod_role_check(self, ctx: Context, guild: Guild):
+    async def mod_role_check(self, ctx: Context, guild: Guild) -> None:
         modrole = (await self.fetch_role_data(guild)).get("modrole")
         if not (
             await self.has_permissions(ctx.author, "kick_members")

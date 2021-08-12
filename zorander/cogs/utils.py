@@ -9,7 +9,7 @@ from discord.ext import commands
 from discord.ext.commands import Cog, command
 
 from zorander import Bot
-from zorander.cogs.errors import MessageNotRefrenced
+from zorander.cogs.errors import MessageNotFound
 from zorander.core.models import ModerationRoles, MuteModel
 
 from ..core.models import GuildModel
@@ -18,8 +18,7 @@ from ..core.models import GuildModel
 class Utils(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        self.bot.sniped_messages = {}
-        self.message_not_referenced = MessageNotRefrenced()
+        self.message_not_referenced = MessageNotFound()
 
     @command(
         name="changeprefix", aliases=["chp"], brief="Change the prefix of the server."

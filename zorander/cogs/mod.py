@@ -20,7 +20,7 @@ time_dict = {"h": 3600, "s": 1, "m": 60, "d": 86400}
 
 
 class TimeConverter(commands.Converter):
-    async def convert(self, ctx, argument) -> float:
+    async def convert(self, ctx:commands.Context, argument:str) -> float:
         args = argument.lower()
         matches = re.findall(time_regex, args)
         time = 0
@@ -50,7 +50,7 @@ class Mod(Cog):
         time: TimeConverter,
         *,
         reason: Optional[str] = "No reason specified.",
-    ):
+    ) -> None:
         """Mute a member from the server."""
         author = ctx.author
         guild = ctx.guild
@@ -115,7 +115,7 @@ class Mod(Cog):
         members: Greedy[Member],
         *,
         reason: Optional[str] = "No reason provided.",
-    ):
+    ) -> None:
         """Unmute a member from the server."""
         author = ctx.author
         guild = ctx.guild
@@ -126,7 +126,7 @@ class Mod(Cog):
         else:
             await self.unmute_handler(ctx, members, reason=reason)
 
-    async def unmute_handler(self, ctx, members, *, reason="Mute Duration Expired!"):
+    async def unmute_handler(self, ctx, members, *, reason="Mute Duration Expired!") -> None:
         muted_role = await self.permissions.muted_role_check(ctx.guild)
         guild = ctx.guild
         author = ctx.author
@@ -154,7 +154,7 @@ class Mod(Cog):
                 await log_channel.send(embed=embed)
                 await ctx.send(f":loud_sound: Unmuted `{member.name}`.")
             else:
-                pass
+                await log_channel.send("Looks like Member is already unmuted.\nIgnoring this exception.")
 
 
 def setup(bot: Bot) -> None:
