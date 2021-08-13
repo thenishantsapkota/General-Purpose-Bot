@@ -47,7 +47,7 @@ class Mod(Cog):
         self,
         ctx: commands.Context,
         members: Greedy[Member],
-        time: TimeConverter,
+        time: Optional[TimeConverter] = 600,
         *,
         reason: Optional[str] = "No reason specified.",
     ) -> None:
@@ -60,48 +60,48 @@ class Mod(Cog):
         unmutes = []
         pretty_time = pretty_timedelta(timedelta(seconds=time))
         for member in members:
-            if author.top_role > member.top_role:
-                if muted_role not in member.roles:
-                    end_time = datetime.now() + timedelta(seconds=time)
-                    role_ids = ",".join([str(r.id) for r in member.roles])
-                    model, _ = await MuteModel.get_or_create(
-                        guild_id=guild.id,
-                        member_id=member.id,
-                        time=end_time,
-                        role_id=role_ids,
-                    )
-                    await model.save()
-                    if ctx.guild.premium_subscriber_role in member.roles:
-                        await member.edit(
-                            roles=[muted_role, ctx.guild.premium_subscriber_role],
-                            reason="Muted the User",
-                        )
-                    elif ctx.guild.premium_subscriber_role not in member.roles:
-                        await member.edit(roles=[muted_role], reason="Muted the user.")
-
-                    embed = Embed(
-                        description=f"**:mute: Muted {member} [ID {member.id}]\nTime: {pretty_time}**",
-                        color=Color.red(),
-                        timestamp=datetime.utcnow(),
-                    )
-                    embed.set_author(
-                        name=f"{author} [ID {author.id}]",
-                        icon_url=author.avatar_url,
-                    )
-                    embed.add_field(name="Reason", value=reason)
-                    embed.set_thumbnail(url=member.avatar_url)
-                    await log_channel.send(embed=embed)
-                    await ctx.send(f":mute: Muted `{member.name}` for {pretty_time}.")
-
-                    if time:
-                        unmutes.append(member)
-                else:
-                    await ctx.send("Member is already muted.", delete_after=10)
-            else:
-                await ctx.send(
-                    "You cannot run moderation actions on the users on same rank as you or higher than you.",
-                    delete_after=10,
+            self.permissions.has_higher_role(author,member)
+            if muted_role not in member.roles:
+                end_time = datetime.now() + timedelta(seconds=time)
+                role_ids = ",".join([str(r.id) for r in member.roles])
+                model, _ = await MuteModel.get_or_create(
+                    guild_id=guild.id,
+                    member_id=member.id,
+                    time=end_time,
+                    role_id=role_ids,
                 )
+                await model.save()
+                if ctx.guild.premium_subscriber_role in member.roles:
+                    await member.edit(
+                        roles=[muted_role, ctx.guild.premium_subscriber_role],
+                        reason="Muted the User",
+                    )
+                elif ctx.guild.premium_subscriber_role not in member.roles:
+                    await member.edit(roles=[muted_role], reason="Muted the user.")
+
+                embed = Embed(
+                    description=f"**:mute: Muted {member} [ID {member.id}]\nTime: {pretty_time}**",
+                    color=Color.red(),
+                    timestamp=datetime.utcnow(),
+                )
+                embed.set_author(
+                    name=f"{author} [ID {author.id}]",
+                    icon_url=author.avatar_url,
+                )
+                embed.add_field(name="Reason", value=reason)
+                embed.set_thumbnail(url=member.avatar_url)
+                await log_channel.send(embed=embed)
+                await ctx.send(f":mute: Muted `{member.name}` for {pretty_time}.")
+
+                if time:
+                    unmutes.append(member)
+            else:
+                await ctx.send("Member is already muted.", delete_after=10)
+            try:
+                await member.send(f":mute: Muted from {guild.name} for {reason}.\nTime: {pretty_time}")
+            except discord.Forbidden:
+                pass
+
         if len(unmutes):
             await asyncio.sleep(time)
             await self.unmute_handler(ctx, members)
@@ -120,11 +120,7 @@ class Mod(Cog):
         author = ctx.author
         guild = ctx.guild
         await self.permissions.mod_role_check(ctx, guild)
-        if not len(members):
-            await ctx.send("One or more required arguments are missing.")
-
-        else:
-            await self.unmute_handler(ctx, members, reason=reason)
+        await self.unmute_handler(ctx, members, reason=reason)
 
     async def unmute_handler(self, ctx, members, *, reason="Mute Duration Expired!") -> None:
         muted_role = await self.permissions.muted_role_check(ctx.guild)
@@ -155,6 +151,41 @@ class Mod(Cog):
                 await ctx.send(f":loud_sound: Unmuted `{member.name}`.")
             else:
                 await log_channel.send("Looks like Member is already unmuted.\nIgnoring this exception.")
+            try:
+                await member.send(f":loud_sound: Unmuted from `{guild.name}`")
+            except discord.Forbidden:
+                pass
+    
+    @command(name="kick", aliases=["boot"])
+    async def kick_command(self, ctx: commands.Context, members: Greedy[Member], *, reason:str) -> None:
+        """Kick the member from the server."""
+        author = ctx.author
+        guild = ctx.guild
+        await self.permissions.mod_role_check(ctx, guild)
+        log_channel = await self.permissions.log_channel_check(guild)
+        for member in members:
+            self.permissions.has_higher_role(author, member)
+            await member.kick(reason=reason)
+            embed = Embed(
+                    color=Color.red(),
+                    timestamp=datetime.utcnow(),
+                    description=f"**:boot: Kicked {member} [ID {member.id}]**",
+                )
+            embed.set_author(
+                name=f"{author} [ID {author.id}]",
+                icon_url=author.avatar_url,
+            )
+            embed.add_field(name="Reason", value=reason)
+            embed.set_thumbnail(url=member.avatar_url)
+            await log_channel.send(embed=embed)
+            await ctx.send(f":boot: Kicked `{member.name}.`")
+            try:
+                await member.send(f":boot: You have been kicked from {guild.name} for reason:`{reason}`")
+            except discord.Forbidden:
+                pass
+    
+
+
 
 
 def setup(bot: Bot) -> None:
