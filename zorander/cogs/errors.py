@@ -89,7 +89,7 @@ class Errors(Cog):
             await ctx.reply(embed=embed)
             return
 
-        if isinstance(error, commands.UserInputError):
+        if isinstance(error, commands.MissingRequiredArgument):
             e = await self.bot.help_command.send_help(ctx.command)
             e.set_footer(text=f"Invoked by {ctx.author} | Missing Required Arguments")
             await ctx.send(embed=e)
