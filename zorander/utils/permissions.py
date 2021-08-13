@@ -18,6 +18,10 @@ class SetModerationRoles(commands.CommandError):
 
     pass
 
+class NotHigherRole(commands.CommandError):
+    """Class that raises errors when author's top role is lower than member's top role"""
+    pass
+
 
 class Permissions:
     """Custom class for setting guild perms."""
@@ -91,3 +95,7 @@ class Permissions:
                     read_message_history=True,
                 )
         return muted_role
+    
+    def has_higher_role(self, author: discord.Member, member: discord.Member) -> None:
+        if not author.top_role > member.top_role:
+            raise NotHigherRole("You cannot run moderation actions on the users on same rank as you or higher than you.")
