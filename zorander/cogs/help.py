@@ -3,7 +3,7 @@ from discord.ext import commands
 
 from zorander import Bot
 
-bot_links = """[Support](https://discord.gg/itsnporg)\u2800\
+bot_links = """[Support](https://discord.gg/8kXUgdMzDG)\u2800\
 [GitHub](https://github.com/thenishantsapkota\General-Purpose-Bot)\u2800\
 [Suggestions](https://github.com/thenishantsapkota/General-Purpose-Bot/issues)"""
 
