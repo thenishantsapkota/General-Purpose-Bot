@@ -6,9 +6,7 @@ from typing import Optional
 import discord
 from discord import Color, Embed, Guild, Member, Role, User
 from discord.ext import commands
-from discord.ext.commands import Cog, command
-from discord.ext.commands.converter import Greedy
-from discord.message import PartialMessage
+from discord.ext.commands import Cog, command, Greedy
 
 from zorander import Bot
 from zorander.core.models import ModerationRoles, MuteModel, WarnModel
@@ -227,26 +225,86 @@ class Mod(Cog):
                 pass
 
     @command(name="unban")
-    async def unban_command(self, ctx: commands.Context, user_id: int) -> None:
+    async def unban_command(self, ctx: commands.Context, user: User) -> None:
         author = ctx.author
         guild = ctx.guild
-        await self.permissions.mod_role_check(ctx, guild)
+        await self.permissions.admin_role_check(ctx, guild)
         log_channel = await self.permissions.log_channel_check(guild)
-        member = await self.bot.fetch_user(user_id)
-        await guild.unban(member)
+        await guild.unban(user)
         embed = Embed(
             color=Color.green(),
             timestamp=datetime.utcnow(),
-            description=f"**:unlock: Unbanned {member} [ID {member.id}]**",
+            description=f"**:unlock: Unbanned {user} [ID {user.id}]**",
         )
         embed.set_author(
             name=f"{author} [ID {author.id}]",
             icon_url=author.avatar_url,
         )
         embed.add_field(name="Reason", value="Unbanned by Admin")
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=user.avatar_url)
         await log_channel.send(embed=embed)
-        await ctx.send(f":unlock: Unbanned `{member.name}.`")
+        await ctx.send(f":unlock: Unbanned `{user.name}.`")
+
+    @command(name="warn")
+    async def warn_command(
+        self, ctx: commands.Context, members: Greedy[Member], *, reason: str
+    ) -> None:
+        """Warns the members mentioned."""
+        author = ctx.author
+        guild = ctx.guild
+        await self.permissions.staff_role_check(ctx, guild)
+        log_channel = await self.permissions.log_channel_check(guild)
+        for member in members:
+            self.permissions.has_higher_role(author, member)
+            model = await WarnModel.create(
+                guild_id=guild.id, member_id=member.id, reason=reason
+            )
+            await model.save()
+            warn_model = await WarnModel.filter(guild_id=guild.id, member_id=member.id)
+            if len(warn_model) > 7:
+                await member.kick(reason="Too Many Warnings")
+                embed = Embed(
+                    color=Color.red(),
+                    timestamp=datetime.utcnow(),
+                    description=f"**:boot: Kicked {member} [ID {member.id}]**",
+                )
+                embed.set_author(
+                    name=f"{self.bot.user} [ID {self.bot.user.id}]",
+                    icon_url=self.bot.user.avatar_url,
+                )
+                embed.add_field(name="Reason", value="Too Many Warnings")
+                embed.set_thumbnail(url=member.avatar_url)
+                await log_channel.send(embed=embed)
+                await ctx.send(f":boot: Kicked `{member.name}.`")
+
+                try:
+                    await member.send(
+                        f":boot: You have been kicked from `{guild.name}`\nReason: `Too Many Warnings.`"
+                    )
+
+                except discord.Forbidden:
+                    pass
+
+            embed = Embed(
+                color=Color.red(),
+                timestamp=datetime.utcnow(),
+                description=f"**:warning: Warned {member} [ID {member.id}]**",
+            )
+            embed.set_author(
+                name=f"{author} [ID {author.id}]",
+                icon_url=author.avatar_url,
+            )
+            embed.add_field(name="Reason", value=reason)
+            embed.set_thumbnail(url=member.avatar_url)
+            await log_channel.send(embed=embed)
+            await ctx.send(f":warning: Warned `{member.name}`")
+            try:
+                await member.send(
+                    f":warning: You have been warned in `{guild.name}`\nReason: `{reason}`"
+                )
+
+            except discord.Forbidden:
+                pass
 
 
 def setup(bot: Bot) -> None:
