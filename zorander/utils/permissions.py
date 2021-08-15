@@ -1,4 +1,6 @@
 """Module that helps in setting up moderation roles for the server."""
+from operator import mod
+
 import discord
 from discord import Guild, Member, Role, TextChannel
 from discord.ext import commands
@@ -18,8 +20,10 @@ class SetModerationRoles(commands.CommandError):
 
     pass
 
+
 class NotHigherRole(commands.CommandError):
     """Class that raises errors when author's top role is lower than member's top role"""
+
     pass
 
 
@@ -61,7 +65,7 @@ class Permissions:
             or await self.rolecheck(ctx.author, staffrole)
         ):
             raise NotEnoughPermissions(
-                "You don't have either the roles required or the permissions to run this command."
+                f"You don't have the required permissions or,\nYou don't have {staffrole.mention} role to run this command."
             )
 
     async def mod_role_check(self, ctx: Context, guild: Guild) -> None:
@@ -71,7 +75,17 @@ class Permissions:
             or await self.rolecheck(ctx.author, modrole)
         ):
             raise NotEnoughPermissions(
-                "You don't have either the roles required or the permissions."
+                f"You don't have the required permissions or,\nYou don't have {modrole.mention} role to run this command."
+            )
+
+    async def admin_role_check(self, ctx: Context, guild: Guild) -> None:
+        adminrole = (await self.fetch_role_data(guild)).get("adminrole")
+        if not (
+            await self.has_permissions(ctx.author, "manage_guild")
+            or await self.rolecheck(ctx.author, adminrole)
+        ):
+            raise NotEnoughPermissions(
+                f"You don't have the required permissions or,\nYou don't have {adminrole.mention} role to run this command."
             )
 
     async def log_channel_check(self, guild: Guild) -> TextChannel:
@@ -95,7 +109,9 @@ class Permissions:
                     read_message_history=True,
                 )
         return muted_role
-    
+
     def has_higher_role(self, author: discord.Member, member: discord.Member) -> None:
         if not author.top_role > member.top_role:
-            raise NotHigherRole("You cannot run moderation actions on the users on same rank as you or higher than you.")
+            raise NotHigherRole(
+                "You cannot run moderation actions on the users on same rank as you or higher than you."
+            )
