@@ -53,17 +53,26 @@ class Mod(Cog):
         author = ctx.author
         guild = ctx.guild
         await self.permissions.staff_role_check(ctx, guild)
-        muted_role = await self.permissions.muted_role_check(guild)
-        log_channel = await self.permissions.log_channel_check(guild)
+        await self.mute_handler(ctx, members, time, reason)
+
+    async def mute_handler(
+        self,
+        ctx: commands.Context,
+        members: Greedy[Member],
+        time,
+        reason,
+    ):
+        muted_role = await self.permissions.muted_role_check(ctx.guild)
+        log_channel = await self.permissions.log_channel_check(ctx.guild)
         unmutes = []
         pretty_time = pretty_timedelta(timedelta(seconds=time))
         for member in members:
-            self.permissions.has_higher_role(author, member)
+            self.permissions.has_higher_role(ctx.author, member)
             if muted_role not in member.roles:
                 end_time = datetime.now() + timedelta(seconds=time)
                 role_ids = ",".join([str(r.id) for r in member.roles])
                 model, _ = await MuteModel.get_or_create(
-                    guild_id=guild.id,
+                    guild_id=ctx.guild.id,
                     member_id=member.id,
                     time=end_time,
                     role_id=role_ids,
@@ -83,8 +92,8 @@ class Mod(Cog):
                     timestamp=datetime.utcnow(),
                 )
                 embed.set_author(
-                    name=f"{author} [ID {author.id}]",
-                    icon_url=author.avatar_url,
+                    name=f"{ctx.author} [ID {ctx.author.id}]",
+                    icon_url=ctx.author.avatar_url,
                 )
                 embed.add_field(name="Reason", value=reason)
                 embed.set_thumbnail(url=member.avatar_url)
@@ -97,7 +106,7 @@ class Mod(Cog):
                 await ctx.send("Member is already muted.", delete_after=10)
             try:
                 await member.send(
-                    f":mute: Muted from {guild.name} for {reason}.\nTime: {pretty_time}"
+                    f":mute: Muted from {ctx.guild.name} for {reason}.\nTime: {pretty_time}"
                 )
             except discord.Forbidden:
                 pass
@@ -131,7 +140,9 @@ class Mod(Cog):
         log_channel = await self.permissions.log_channel_check(ctx.guild)
         for member in members:
             if muted_role in member.roles:
-                model = await MuteModel.get(guild_id=guild.id, member_id=member.id)
+                model = await MuteModel.get_or_none(
+                    guild_id=guild.id, member_id=member.id
+                )
                 role_ids = model.role_id
                 roles = [
                     guild.get_role(int(id_)) for id_ in role_ids.split(",") if len(id_)
@@ -168,9 +179,14 @@ class Mod(Cog):
         author = ctx.author
         guild = ctx.guild
         await self.permissions.mod_role_check(ctx, guild)
-        log_channel = await self.permissions.log_channel_check(guild)
+        await self.kick_handler(ctx, members, reason)
+
+    async def kick_handler(
+        self, ctx: commands.Context, members: Greedy[Member], reason
+    ):
+        log_channel = await self.permissions.log_channel_check(ctx.guild)
         for member in members:
-            self.permissions.has_higher_role(author, member)
+            self.permissions.has_higher_role(ctx.author, member)
             await member.kick(reason=reason)
             embed = Embed(
                 color=Color.red(),
@@ -178,8 +194,8 @@ class Mod(Cog):
                 description=f"**:boot: Kicked {member} [ID {member.id}]**",
             )
             embed.set_author(
-                name=f"{author} [ID {author.id}]",
-                icon_url=author.avatar_url,
+                name=f"{ctx.author} [ID {ctx.author.id}]",
+                icon_url=ctx.author.avatar_url,
             )
             embed.add_field(name="Reason", value=reason)
             embed.set_thumbnail(url=member.avatar_url)
@@ -187,7 +203,7 @@ class Mod(Cog):
             await ctx.send(f":boot: Kicked `{member.name}.`")
             try:
                 await member.send(
-                    f":boot: You have been kicked from {guild.name} for reason:`{reason}`"
+                    f":boot: You have been kicked from {ctx.guild.name} for reason:`{reason}`"
                 )
             except discord.Forbidden:
                 pass
@@ -244,67 +260,6 @@ class Mod(Cog):
         embed.set_thumbnail(url=user.avatar_url)
         await log_channel.send(embed=embed)
         await ctx.send(f":unlock: Unbanned `{user.name}.`")
-
-    @command(name="warn")
-    async def warn_command(
-        self, ctx: commands.Context, members: Greedy[Member], *, reason: str
-    ) -> None:
-        """Warns the members mentioned."""
-        author = ctx.author
-        guild = ctx.guild
-        await self.permissions.staff_role_check(ctx, guild)
-        log_channel = await self.permissions.log_channel_check(guild)
-        for member in members:
-            self.permissions.has_higher_role(author, member)
-            model = await WarnModel.create(
-                guild_id=guild.id, member_id=member.id, reason=reason
-            )
-            await model.save()
-            warn_model = await WarnModel.filter(guild_id=guild.id, member_id=member.id)
-            if len(warn_model) > 7:
-                await member.kick(reason="Too Many Warnings")
-                embed = Embed(
-                    color=Color.red(),
-                    timestamp=datetime.utcnow(),
-                    description=f"**:boot: Kicked {member} [ID {member.id}]**",
-                )
-                embed.set_author(
-                    name=f"{self.bot.user} [ID {self.bot.user.id}]",
-                    icon_url=self.bot.user.avatar_url,
-                )
-                embed.add_field(name="Reason", value="Too Many Warnings")
-                embed.set_thumbnail(url=member.avatar_url)
-                await log_channel.send(embed=embed)
-                await ctx.send(f":boot: Kicked `{member.name}.`")
-
-                try:
-                    await member.send(
-                        f":boot: You have been kicked from `{guild.name}`\nReason: `Too Many Warnings.`"
-                    )
-
-                except discord.Forbidden:
-                    pass
-
-            embed = Embed(
-                color=Color.red(),
-                timestamp=datetime.utcnow(),
-                description=f"**:warning: Warned {member} [ID {member.id}]**",
-            )
-            embed.set_author(
-                name=f"{author} [ID {author.id}]",
-                icon_url=author.avatar_url,
-            )
-            embed.add_field(name="Reason", value=reason)
-            embed.set_thumbnail(url=member.avatar_url)
-            await log_channel.send(embed=embed)
-            await ctx.send(f":warning: Warned `{member.name}`")
-            try:
-                await member.send(
-                    f":warning: You have been warned in `{guild.name}`\nReason: `{reason}`"
-                )
-
-            except discord.Forbidden:
-                pass
 
 
 def setup(bot: Bot) -> None:
