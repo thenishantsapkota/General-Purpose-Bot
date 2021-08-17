@@ -74,15 +74,15 @@ class Utils(Cog):
             timestamp=datetime.utcnow(),
         )
         embed.set_author(
-            name=f"{self.client.user} [ID {self.client.user.id}]",
-            icon_url=self.client.user.avatar_url,
+            name=f"{self.bot.user} [ID {self.bot.user.id}]",
+            icon_url=self.bot.user.avatar_url,
         )
         embed.add_field(name="Reason", value="Mute Duration Expired.")
         embed.set_thumbnail(url=member.avatar_url)
         await logChannel.send(embed=embed)
 
     @commands.group(invoke_without_command=True)
-    async def role(self, ctx):
+    async def role(self, ctx: commands.Context):
         """Role group to set moderation roles for the server."""
         embed = Embed(
             color=self.bot.color,
@@ -100,7 +100,7 @@ class Utils(Cog):
 
     @role.group(name="admin")
     @commands.has_permissions(administrator=True)
-    async def adminroleset(self, ctx, role: Role):
+    async def adminroleset(self, ctx: commands.Context, role: Role):
         """Set admin role for the server."""
         guild = ctx.guild
         author = ctx.author
@@ -119,7 +119,7 @@ class Utils(Cog):
 
     @role.group(name="mod")
     @commands.has_permissions(administrator=True)
-    async def modroleset(self, ctx, role: Role):
+    async def modroleset(self, ctx: commands.Context, role: Role):
         """Set mod role for the server."""
         guild = ctx.guild
         author = ctx.author
@@ -138,7 +138,7 @@ class Utils(Cog):
 
     @role.group(name="staff")
     @commands.has_permissions(administrator=True)
-    async def staffroleset(self, ctx, role: Role):
+    async def staffroleset(self, ctx: commands.Context, role: Role):
         """Set staff role in server"""
         guild = ctx.guild
         author = ctx.author
@@ -157,7 +157,7 @@ class Utils(Cog):
 
     @role.group(name="list", brief="List the admin, mod and staff roles of the server")
     @commands.has_permissions(administrator=True)
-    async def list_command(self, ctx):
+    async def list_command(self, ctx: commands.Context):
         """List the admin, mod and staff roles of the server"""
         author = ctx.author
         guild = ctx.guild
