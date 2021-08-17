@@ -48,12 +48,14 @@ class MuteModel(Model):
         table_description = "Stores Per Guild Mute Data"
 
 
-class WarnModel(Model):
+class WarningsModel(Model):
     "Defining a warn model to store warns"
     id = fields.IntField(pk=True)
     member_id = fields.BigIntField()
     guild_id = fields.BigIntField()
     reason = fields.TextField()
+    author_name = fields.TextField()
+    date = fields.TextField()
 
     class Meta:
         """Meta class to set table name and description"""
