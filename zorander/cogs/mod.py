@@ -6,10 +6,10 @@ from typing import Optional
 import discord
 from discord import Color, Embed, Guild, Member, Role, User
 from discord.ext import commands
-from discord.ext.commands import Cog, command, Greedy
+from discord.ext.commands import Cog, Greedy, command
 
 from zorander import Bot
-from zorander.core.models import ModerationRoles, MuteModel, WarnModel
+from zorander.core.models import ModerationRoles, MuteModel, WarningsModel
 from zorander.utils.permissions import Permissions
 from zorander.utils.time import *
 
@@ -19,6 +19,25 @@ time_dict = {"h": 3600, "s": 1, "m": 60, "d": 86400}
 
 class TimeConverter(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> float:
+        """Function that converts given time into seconds.
+
+        Parameters
+        ----------
+        ctx : commands.Context
+            Context of the command invokation.
+        argument : str
+            Time to be converted
+
+        Returns
+        -------
+        float
+            Time in seconds.
+
+        Raises
+        ------
+        commands.BadArgument
+            When the values are wrong and when the input doesn't match the input regex.
+        """
         args = argument.lower()
         matches = re.findall(time_regex, args)
         time = 0
@@ -59,9 +78,22 @@ class Mod(Cog):
         self,
         ctx: commands.Context,
         members: Greedy[Member],
-        time,
-        reason,
+        time: float,
+        reason: str,
     ):
+        """Function that handles Mutes
+
+        Parameters
+        ----------
+        ctx : commands.Context
+            Context of the command invokation.
+        members : Greedy[Member]
+            List of members to be muted.
+        time : float
+            Amount of Time user are to be muted for (in seconds).
+        reason : str
+            Reason for the mute.
+        """
         muted_role = await self.permissions.muted_role_check(ctx.guild)
         log_channel = await self.permissions.log_channel_check(ctx.guild)
         unmutes = []
@@ -106,7 +138,7 @@ class Mod(Cog):
                 await ctx.send("Member is already muted.", delete_after=10)
             try:
                 await member.send(
-                    f":mute: Muted from {ctx.guild.name} for {reason}.\nTime: {pretty_time}"
+                    f":mute: Muted from {ctx.guild.name} \nReason:{reason}.\nTime: {pretty_time}"
                 )
             except discord.Forbidden:
                 pass
@@ -132,8 +164,20 @@ class Mod(Cog):
         await self.unmute_handler(ctx, members, reason=reason)
 
     async def unmute_handler(
-        self, ctx, members, *, reason="Mute Duration Expired!"
+        self, ctx: commands.Context, members: list[Member], *, reason="Mute Duration Expired!"
     ) -> None:
+        """
+        Function that handles unmutes.
+
+        Parameters
+        ----------
+        ctx : commands.Context
+            Context of the Command Invokation.
+        members : list[Member]
+            List of members to be unmuted.
+        reason : str, optional
+            Reason for the unmute, by default "Mute Duration Expired!"
+        """
         muted_role = await self.permissions.muted_role_check(ctx.guild)
         guild = ctx.guild
         author = ctx.author
@@ -184,6 +228,18 @@ class Mod(Cog):
     async def kick_handler(
         self, ctx: commands.Context, members: Greedy[Member], reason
     ):
+        """
+        Function that handles kicks
+
+        Parameters
+        ----------
+        ctx : commands.Context
+            Context of the command invokation
+        members : Greedy[Member]
+            List of Members to kick.
+        reason : [type]
+            Reason for the kick.
+        """
         log_channel = await self.permissions.log_channel_check(ctx.guild)
         for member in members:
             self.permissions.has_higher_role(ctx.author, member)
@@ -212,6 +268,7 @@ class Mod(Cog):
     async def ban_command(
         self, ctx: commands.Context, members: Greedy[Member], reason: str
     ) -> None:
+        """Ban a user from the server."""
         author = ctx.author
         guild = ctx.guild
 
@@ -242,6 +299,7 @@ class Mod(Cog):
 
     @command(name="unban")
     async def unban_command(self, ctx: commands.Context, user: User) -> None:
+        """"Unban a member from the server."""
         author = ctx.author
         guild = ctx.guild
         await self.permissions.admin_role_check(ctx, guild)
