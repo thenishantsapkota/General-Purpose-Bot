@@ -54,10 +54,10 @@ class Misc(Cog):
             activities = []
             for activity in member.activities:
                 activities.append(activity.name)
-        activity_list = "\n".join(
-            [f"{i+1}. {activity_name}" for (i, activity_name) in enumerate(activities)]
-        )
-        embed.add_field(name="Activity", value=activity_list)
+            activity_list = "\n".join(
+                [f"{i+1}. {activity_name}" for (i, activity_name) in enumerate(activities)]
+            )
+            embed.add_field(name="Activity", value=activity_list)
 
         now = datetime.now()
         created_at = member.created_at
