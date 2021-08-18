@@ -164,7 +164,11 @@ class Mod(Cog):
         await self.unmute_handler(ctx, members, reason=reason)
 
     async def unmute_handler(
-        self, ctx: commands.Context, members: list[Member], *, reason="Mute Duration Expired!"
+        self,
+        ctx: commands.Context,
+        members: list[Member],
+        *,
+        reason="Mute Duration Expired!",
     ) -> None:
         """
         Function that handles unmutes.
@@ -299,7 +303,7 @@ class Mod(Cog):
 
     @command(name="unban")
     async def unban_command(self, ctx: commands.Context, user: User) -> None:
-        """"Unban a member from the server."""
+        """ "Unban a member from the server."""
         author = ctx.author
         guild = ctx.guild
         await self.permissions.admin_role_check(ctx, guild)

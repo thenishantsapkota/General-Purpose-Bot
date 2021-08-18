@@ -24,7 +24,7 @@ class Errors(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
-    @Cog.listener() 
+    @Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error) -> None:
         if hasattr(ctx.command, "on_error"):
             return
@@ -104,7 +104,6 @@ class Errors(Cog):
                     description="This command cannot be used in direct messages.",
                 )
                 await ctx.author.send(embed=embed)
-                # await ctx.author.reply('This command cannot be used in direct messages.')
             except discord.Forbidden:
                 pass
             return
