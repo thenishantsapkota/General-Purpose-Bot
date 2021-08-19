@@ -16,7 +16,7 @@ from tortoise import Tortoise
 from ..utils.activity import CustomActivity
 from ..utils.cogload import CogsLoad
 from ..utils.cogreload import CogsReload
-from .models import GuildModel
+from .models import GuildModel, OverrideModel
 from .tortoise_config import tortoise_config
 
 os.environ.setdefault("JISHAKU_HIDE", "1")
@@ -25,6 +25,10 @@ os.environ.setdefault("JISHAKU_NO_UNDERSCORE", "1")
 
 logger = logging.getLogger("zorander.main")
 logging.basicConfig(level=logging.INFO)
+
+
+class CommandDisabled(commands.CommandError):
+    pass
 
 
 class Bot(commands.Bot):
@@ -38,11 +42,12 @@ class Bot(commands.Bot):
         self.reloader = CogsReload(self)
         self.loader = CogsLoad(self)
         self.custom_activity = CustomActivity(self)
-        self.owner_id = 852617608309112882
         super().__init__(
             command_prefix=self._get_prefix,
             intents=discord.Intents.all(),
         )
+        self.add_check(self.checkenabled)
+        self.owner_ids = [852617608309112882]
 
     async def _get_prefix(self, bot: commands.Bot, message: discord.Message) -> str:
         if not message.guild:
@@ -54,8 +59,9 @@ class Bot(commands.Bot):
 
     @property
     def session(self) -> ClientSession:
-        return self.http._HTTPClient__session  # type: ignore
+        return self.http._HTTPClient__session
 
+    
     @tasks.loop(seconds=0, count=1)
     async def connect_db(self) -> None:
         logger.info("Connecting to the Database....")
@@ -73,3 +79,15 @@ class Bot(commands.Bot):
 
         self.connect_db.start()
         logger.info(f"Logged in as {self.user}")
+    
+
+    async def checkenabled(self, ctx: commands.Context) -> None:
+        check = await OverrideModel.get_or_none(
+            guild_id=ctx.guild.id,
+            channel_id=ctx.channel.id,
+            command_name=ctx.command.name,
+            enable=False,
+        )
+        if check:
+            raise CommandDisabled(message="Command Disabled in this channel")
+        return True
