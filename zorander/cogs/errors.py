@@ -11,9 +11,9 @@ from discord.channel import VoiceChannel
 from discord.ext import commands
 from discord.ext.commands import Cog, command
 from discord.utils import get
+from typing import TYPE_CHECKING
 
 from zorander import Bot
-
 
 class MessageNotFound(commands.CommandError):
     def __str__(self):
