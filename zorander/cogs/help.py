@@ -86,7 +86,7 @@ class HelpCommand(commands.HelpCommand):
 
     async def send_command_help(self, command):
         embed = discord.Embed(title=command.qualified_name, colour=self.COLOUR)
-        embed.add_field(name="Syntax", value=self.get_command_signature(command))
+        embed.add_field(name="Syntax", value=f"```{self.get_command_signature(command)}```")
         if command.help:
             embed.description = command.help
 
@@ -96,7 +96,7 @@ class HelpCommand(commands.HelpCommand):
 
     async def send_help(self, command):
         embed = discord.Embed(title=command.qualified_name, colour=self.COLOUR)
-        embed.add_field(name="Syntax", value=self.get_command_signature(command))
+        embed.add_field(name="Syntax", value=f"```{self.get_command_signature(command)}```")
         if command.help:
             embed.description = command.help
         return embed
