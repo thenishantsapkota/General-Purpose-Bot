@@ -1,10 +1,11 @@
 import asyncio
 import re
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Optional
 
 import discord
 from discord import Color, Embed, Guild, Member, Role, User
+from discord.channel import TextChannel
 from discord.ext import commands
 from discord.ext.commands import Cog, Greedy, command
 
@@ -230,7 +231,7 @@ class Mod(Cog):
         await self.kick_handler(ctx, members, reason)
 
     async def kick_handler(
-        self, ctx: commands.Context, members: Greedy[Member], reason
+        self, ctx: commands.Context, members: Greedy[Member], reason: str
     ):
         """
         Function that handles kicks
@@ -241,7 +242,7 @@ class Mod(Cog):
             Context of the command invokation
         members : Greedy[Member]
             List of Members to kick.
-        reason : [type]
+        reason : str
             Reason for the kick.
         """
         log_channel = await self.permissions.log_channel_check(ctx.guild)
@@ -322,6 +323,100 @@ class Mod(Cog):
         embed.set_thumbnail(url=user.avatar_url)
         await log_channel.send(embed=embed)
         await ctx.send(f":unlock: Unbanned `{user.name}.`")
+
+    @command(name="clean", aliases=["purge"])
+    async def clean_command(
+        self,
+        ctx: commands.Context,
+        member: Optional[Member],
+        message_count: Optional[int] = 10,
+    ) -> None:
+        """Clean a certain amount of messages from a guild channel.\n**(Member is Optional)**"""
+        author = ctx.author
+        guild = ctx.guild
+        await self.permissions.mod_role_check(ctx, guild)
+        log_channel = await self.permissions.log_channel_check(guild)
+        if not member:
+            if message_count > 100:
+                await ctx.send("I can only clear 100 messages at once. :smile:")
+                return
+            await ctx.message.delete()
+            await ctx.channel.purge(limit=message_count)
+            await ctx.send("Messages Deleted.", delete_after=5)
+            embed = Embed(
+                color=Color.red(),
+                timestamp=datetime.utcnow(),
+                title=f"Messages Deleted!",
+                description=f"**{message_count}** messages deleted from {ctx.channel.mention} by {author.mention}",
+            )
+            await log_channel.send(embed=embed)
+            return
+
+        else:
+            member = member or author
+            if message_count > 100:
+                await ctx.send("I can only clear 100 messages at once. :smile:")
+                return
+            await ctx.message.delete()
+            await ctx.channel.purge(
+                limit=message_count + 1, check=lambda message: message.author == member
+            )
+            await ctx.send("Messages Purged.", delete_after=5)
+            embed = Embed(
+                color=Color.red(),
+                timestamp=datetime.utcnow(),
+                title=f"Messages Purged!",
+                description=f"**{message_count}** messages of {member.mention} purged from {ctx.channel.mention} by {author.mention}",
+            )
+            await log_channel.send(embed=embed)
+
+    @command(name="lockchannel")
+    async def lockchannel_command(
+        self, ctx: commands.Context, channel: Optional[TextChannel]
+    ) -> None:
+        """Lock a specific channel in a guild."""
+        guild = ctx.guild
+        author = ctx.author
+        channel = ctx.channel or channel
+        await self.permissions.mod_role_check(ctx, guild)
+        model = await ModerationRoles.get_or_none(guild_id=guild.id)
+        staff_role = discord.utils.get(guild.roles, id=model.staff_role)
+        overwrite_staff = channel.overwrites_for(staff_role)
+        overwrite_staff.send_messages = True
+        overwrite_default = channel.overwrites_for(guild.default_role)
+        overwrite_default.send_messages = False
+        await channel.set_permissions(guild.default_role, overwrite=overwrite_default)
+        await channel.set_permissions(staff_role, overwrite=overwrite_staff)
+        embed = Embed(
+            title="Lock Channel",
+            description="🔒 Channel has been locked!",
+            color=Color.red(),
+        )
+        await ctx.send(embed=embed)
+
+    @command(name="unlockchannel")
+    async def unlockchannel_command(
+        self, ctx: commands.Context, channel: Optional[TextChannel]
+    ) -> None:
+        """Unlock a specific channel in a guild."""
+        guild = ctx.guild
+        author = ctx.author
+        channel = ctx.channel or channel
+        await self.permissions.mod_role_check(ctx, guild)
+        model = await ModerationRoles.get_or_none(guild_id=guild.id)
+        staff_role = discord.utils.get(guild.roles, id=model.staff_role)
+        overwrite_staff = channel.overwrites_for(staff_role)
+        overwrite_staff.send_messages = None
+        overwrite_default = channel.overwrites_for(guild.default_role)
+        overwrite_default.send_messages = None
+        await channel.set_permissions(guild.default_role, overwrite=overwrite_default)
+        await channel.set_permissions(staff_role, overwrite=overwrite_staff)
+        embed = Embed(
+            title="Unlock Channel",
+            description="🔓 Channel has been unlocked!",
+            color=Color.green(),
+        )
+        await ctx.send(embed=embed)
 
 
 def setup(bot: Bot) -> None:
