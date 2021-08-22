@@ -43,20 +43,18 @@ class Snipe(Cog):
 
         except KeyError:
             await ctx.send(
-                "You need to have a deleted message to snipe ya fool.", delete_after=10
+                "You need to have a deleted message to snipe.", delete_after=10
             )
 
         else:
             embed = Embed(
                 color=self.bot.color,
-                description=f"Deleted Message - {sniped_message.content}",
-                timestamp=sniped_message.created_at,
+                description=sniped_message.content,
             )
             embed.set_author(
-                name=f"Deleted Message from - {sniped_message.author.name}",
+                name=sniped_message.author,
                 icon_url=sniped_message.author.avatar_url,
             )
-            embed.set_footer(text=f"Sniped by {ctx.author} | in #{ctx.channel.name}")
             await ctx.send(embed=embed)
 
     @snipe_group.command(name="edited")
@@ -65,14 +63,14 @@ class Snipe(Cog):
             before, after = self.edit_snipes[ctx.channel]
         except KeyError:
             await ctx.send(
-                "You need to have a deleted message to snipe ya fool.", delete_after=10
+                "You need to have a deleted message to snipe.", delete_after=10
             )
         else:
             embed = Embed(color=self.bot.color, timestamp=after.edited_at)
             embed.add_field(name="Before", value=before.content, inline=False)
             embed.add_field(name="After", value=after.content, inline=False)
             embed.set_author(
-                name=f"Edited Message from - {after.author.display_name}",
+                name=after.author,
                 icon_url=after.author.avatar_url,
             )
             embed.set_footer(text=f"Sniped by {ctx.author} | in #{ctx.channel.name}")
