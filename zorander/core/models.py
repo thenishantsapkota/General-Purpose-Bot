@@ -62,3 +62,19 @@ class WarningsModel(Model):
 
         table = "warnings"
         table_description = "Stores Per Guild Warnings"
+
+
+class OverrideModel(Model):
+    """Defining a Override Model to store command overrides"""
+
+    id = fields.IntField(pk=True)
+    command_name = fields.TextField()
+    enable = fields.BooleanField(default=False)
+    channel_id = fields.BigIntField()
+    guild_id = fields.BigIntField()
+
+    class Meta:
+        """Meta class to set table name and description"""
+
+        table = "overrides"
+        table_description = "Stores Overrides"

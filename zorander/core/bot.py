@@ -61,7 +61,6 @@ class Bot(commands.Bot):
     def session(self) -> ClientSession:
         return self.http._HTTPClient__session
 
-    
     @tasks.loop(seconds=0, count=1)
     async def connect_db(self) -> None:
         logger.info("Connecting to the Database....")
@@ -79,7 +78,6 @@ class Bot(commands.Bot):
 
         self.connect_db.start()
         logger.info(f"Logged in as {self.user}")
-    
 
     async def checkenabled(self, ctx: commands.Context) -> None:
         check = await OverrideModel.get_or_none(
