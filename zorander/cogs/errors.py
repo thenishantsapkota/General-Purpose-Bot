@@ -5,15 +5,12 @@ import sys
 import traceback
 
 import discord
-from cachetools import TTLCache
-from discord import Color, Embed, Member
-from discord.channel import VoiceChannel
+from discord import Color, Embed
 from discord.ext import commands
-from discord.ext.commands import Cog, command
-from discord.utils import get
-from typing import TYPE_CHECKING
+from discord.ext.commands import Cog
 
 from zorander import Bot
+
 
 class MessageNotFound(commands.CommandError):
     def __str__(self):
