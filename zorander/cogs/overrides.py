@@ -1,28 +1,32 @@
+from typing import Optional
+
 import discord
-from discord import TextChannel
-from discord import user
+from discord import TextChannel, user
 from discord.ext import commands
-from discord.ext.commands import Cog, command, Greedy
+from discord.ext.commands import Cog, Greedy, command
 
 from zorander import Bot
 from zorander.core.models import OverrideModel
 
-from typing import Optional
-
 
 class CommandOverrides(Cog):
-    def __init__(self, bot : Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
-    
+
     @commands.group()
     @commands.guild_only()
-    @commands.has_permissions(administrator = True)
+    @commands.has_permissions(administrator=True)
     async def toggle(self, ctx: commands.Context) -> None:
         """Enable or Disable commands in a Guild Channel"""
         pass
 
-    
-    async def toggle_handler(self, ctx: commands.Context, usercommand: str, channels: list[TextChannel], toggle: bool) -> None:
+    async def toggle_handler(
+        self,
+        ctx: commands.Context,
+        usercommand: str,
+        channels: list[TextChannel],
+        toggle: bool,
+    ) -> None:
         """
         Function that handles commands being enabled or disabled
 
@@ -55,19 +59,25 @@ class CommandOverrides(Cog):
             toggle_string = "enabled" if toggle else "disabled"
             channel_mention = "".join([channel.mention for channel in channels])
             await ctx.send(f"`{command.name}` {toggle_string} in {channel_mention}")
-    
+
     @toggle.group(name="enable")
-    async def toggle_enable(self, ctx: commands.Context, command: str, channels: Greedy[TextChannel]) -> None:
+    async def toggle_enable(
+        self, ctx: commands.Context, command: str, channels: Greedy[TextChannel]
+    ) -> None:
         """Enable a command in a guild channel."""
         await self.toggle_handler(ctx, command, channels, True)
 
     @toggle.group(name="disable")
-    async def toggle_disable(self, ctx: commands.Context, command: str, channels: Greedy[TextChannel]) -> None:
+    async def toggle_disable(
+        self, ctx: commands.Context, command: str, channels: Greedy[TextChannel]
+    ) -> None:
         """Disable a command in a guild channel."""
         await self.toggle_handler(ctx, command, channels, False)
 
     @toggle.command(name="all")
-    async def toggleall(self, ctx: commands.Context, command: str, toggle: bool) -> None:
+    async def toggleall(
+        self, ctx: commands.Context, command: str, toggle: bool
+    ) -> None:
         """Disable a command in all the guild channels."""
         command = self.bot.get_command(command)
         if not command:
@@ -88,7 +98,9 @@ class CommandOverrides(Cog):
             await ctx.send(f"`{command.name}` {toggle_string} in all channels")
 
     @command()
-    async def check(self, ctx: commands.Context, command: str, channel: Optional[TextChannel]) -> None:
+    async def check(
+        self, ctx: commands.Context, command: str, channel: Optional[TextChannel]
+    ) -> None:
         """Check if command is disabled in a certain channel."""
         command = self.bot.get_command(command)
         channel = channel or ctx.channel
@@ -102,6 +114,7 @@ class CommandOverrides(Cog):
             )
         except AttributeError:
             await ctx.send(f"No data of the command in the database.")
+
 
 def setup(bot: Bot) -> None:
     bot.add_cog(CommandOverrides(bot))
