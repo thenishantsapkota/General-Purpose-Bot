@@ -1,7 +1,12 @@
 import logging
+from math import perm
 import os
 from datetime import datetime, timedelta
 from typing import Optional
+from platform import python_version
+from psutil import Process, virtual_memory
+from discord import __version__ as discord_version
+from time import time
 
 import discord
 from cachetools import TTLCache
@@ -22,6 +27,7 @@ class Misc(Cog):
         self.client = SnowClient(os.environ.get("SNOWFLAKE_API_KEY"))
 
     @command()
+    @commands.guild_only()
     async def ping(self, ctx):
         """Check the response time of the bot."""
         embed = Embed(title="Pinging the API....")
@@ -50,18 +56,6 @@ class Misc(Cog):
         embed.description += f"**Info of** {member.mention}"
         embed.add_field(name="Status", value=str(member.status).title())
 
-        if member.activity:
-            activities = []
-            for activity in member.activities:
-                activities.append(activity.name)
-            activity_list = "\n".join(
-                [
-                    f"{i+1}. {activity_name}"
-                    for (i, activity_name) in enumerate(activities)
-                ]
-            )
-            embed.add_field(name="Activity", value=activity_list)
-
         now = datetime.now()
         created_at = member.created_at
         joined_at = member.joined_at
@@ -75,13 +69,36 @@ class Misc(Cog):
             name="Joined the server on",
             value=f"{pretty_datetime(joined_at)} • {pretty_timedelta(now - joined_at)} ago",
         )
+
         if len(member.roles) > 1:
             embed.add_field(
-                name="Roles",
+                name=f"Roles[{len(member.roles)}]",
                 value=" ".join(role.mention for role in reversed(member.roles[1:])),
                 inline=False,
             )
         embed.set_footer(text=f"ID:{str(member.id)} • Requested by {author}")
+
+        if member.activity:
+            activities = []
+            for activity in member.activities:
+                activities.append(activity.name)
+            activity_list = "\n".join(
+                [
+                    f"**{i+1}.** {activity_name}"
+                    for (i, activity_name) in enumerate(activities)
+                ]
+            )
+            embed.add_field(name="Activity", value=activity_list)
+
+        perm_list = [perm[0] for perm in member.guild_permissions if perm[1]]
+        clean_perms = []
+        for perms in perm_list:
+            clean_perms.append(perms.replace("_", " ").title())
+        embed.add_field(
+            name="Permissions",
+            value=f"{','.join(clean_perms[:10])} and {len(clean_perms[10:])} more.",
+            inline=False,
+        )
 
         embed.set_thumbnail(url=member.avatar_url)
 
@@ -223,6 +240,36 @@ class Misc(Cog):
         embed.set_footer(text=f"Requested by {ctx.author}")
         embed.set_author(name=f"Info of {module_name} - {registry}")
         await ctx.send(embed=embed)
+
+    @command(name="botinfo")
+    @commands.guild_only()
+    async def botinfo_command(self, ctx: commands.Context) -> None:
+        """Get info about the bot."""
+        proc = Process()
+        with proc.oneshot():
+            uptime = timedelta(seconds=time() - proc.create_time())
+            pretty_uptime = pretty_timedelta(uptime)
+            cpu_time = timedelta(seconds=(cpu := proc.cpu_times()).system + cpu.user)
+            pretty_cpu_time = pretty_timedelta(cpu_time)
+            mem_total = virtual_memory().total / (1024 ** 2)
+            mem_of_total = proc.memory_percent()
+            mem_usage = mem_total * (mem_of_total / 100)
+
+        prefixes = await self.bot.get_prefix(ctx.message)
+        prefix = "_".join(prefixes[2:])
+        embed = Embed(
+            title=f"{self.bot.user.name}'s Information",
+            color=self.bot.color,
+            timestamp=datetime.utcnow(),
+            description=f"```Version : 2.0\nLibrary : discord.py\nPython Version : {python_version()}\ndiscord.py version : {discord_version}\nUptime : {pretty_uptime}\nCPU Time : {pretty_cpu_time}\nMemory Usage : {mem_usage:,.3f} MiB /{mem_total:,.0f} MiB\nGuilds : {len(self.bot.guilds)}\nUsers : {len(self.bot.users)}\nPrefix : {prefix}\nClient ID : {self.bot.user.id}```",
+        )
+        embed.set_thumbnail(url=self.bot.user.avatar_url)
+        fields = [("Owner <:crown:879222224438059049>", f"<@852617608309112882>")]
+        for name, value in fields:
+            embed.add_field(name=name, value=value)
+
+        await ctx.send(embed=embed)
+    
 
 
 def setup(bot: Bot) -> None:
