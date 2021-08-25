@@ -1,19 +1,19 @@
 import logging
-from math import perm
 import os
 from datetime import datetime, timedelta
-from typing import Optional
+from math import perm
 from platform import python_version
-from psutil import Process, virtual_memory
-from discord import __version__ as discord_version
 from time import time
+from typing import Optional
 
 import discord
 from cachetools import TTLCache
 from discord import Embed, Member
+from discord import __version__ as discord_version
 from discord.channel import VoiceChannel
 from discord.ext import commands
 from discord.ext.commands import Cog, command
+from psutil import Process, virtual_memory
 from snowflakeapi import SnowClient
 
 from zorander import Bot
@@ -269,7 +269,13 @@ class Misc(Cog):
             embed.add_field(name=name, value=value)
 
         await ctx.send(embed=embed)
-    
+
+    @command(name="botinvite")
+    async def botinvite_command(self, ctx: commands.Context) -> None:
+        """Sends a invite link for the bot"""
+        await ctx.send(
+            f"https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=805314622"
+        )
 
 
 def setup(bot: Bot) -> None:
