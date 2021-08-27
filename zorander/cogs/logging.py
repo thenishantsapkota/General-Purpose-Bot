@@ -11,6 +11,7 @@ from discord.ext.commands import Cog
 from discord.member import VoiceState
 
 from zorander import Bot
+from zorander.core.models import LoggingModel
 from zorander.utils.permissions import Permissions
 
 
@@ -18,6 +19,46 @@ class Logging(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.permissions = Permissions()
+
+    @commands.group(invoke_without_command=True)
+    async def logging(self, ctx: commands.Context) -> None:
+        model = await LoggingModel.get_or_none(guild_id=ctx.guild.id)
+        await ctx.send(
+            f"Logging is {'enabled' if model.enable else 'disabled'} in {ctx.guild.name}\n`enable` and `disable` are the arguments."
+        )
+
+    @logging.command(name="enable")
+    @commands.has_permissions(administrator=True)
+    async def logging_enable(self, ctx: commands.Context) -> None:
+        logging_category = discord.utils.get(
+            ctx.guild.categories, name="Moderation Logs"
+        )
+        if logging_category is None:
+            logging_category = await ctx.guild.create_category(name="Moderation Logs")
+            await logging_category.set_permissions(
+                ctx.guild.default_role, view_channel=False, send_messages=False
+            )
+            channels = [
+                "member-logs",
+                "server-logs",
+                "voice-logs",
+                "message-logs",
+                "mod-logs",
+            ]
+            for channel in channels:
+                await logging_category.create_text_channel(name=channel)
+        model, _ = await LoggingModel.get_or_create(guild_id=ctx.guild.id)
+        model.enable = 1
+        await model.save()
+        await ctx.send("Logging Enabled in this server.")
+
+    @logging.command(name="disable")
+    @commands.has_permissions(administrator=True)
+    async def logging_disable(self, ctx: commands.Context) -> None:
+        model, _ = await LoggingModel.get_or_create(guild_id=ctx.guild.id)
+        model.enable = 0
+        await model.save()
+        await ctx.send("Logging Disabled in this server.")
 
     @Cog.listener()
     async def on_member_update(self, before: Member, after: Member) -> None:
@@ -221,6 +262,34 @@ class Logging(Cog):
                 embed.add_field(name=name, value=value, inline=inline)
 
             await logging_channel.send(embed=embed)
+
+    @Cog.listener()
+    async def on_guild_channel_create(self, channel: GuildChannel) -> None:
+        if not await self.bot.check_logging_disable(channel.guild.id):
+            return
+
+        logging_channel = await self.permissions.logging_channel_check(channel.guild)
+        embed = Embed(
+            color=Color.green(),
+            timestamp=datetime.utcnow(),
+            description=f"Channel {channel.mention} has been created.",
+        )
+        embed.set_author(name=f"Channel Created")
+        await logging_channel.send(embed=embed)
+
+    @Cog.listener()
+    async def on_guild_channel_delete(self, channel: GuildChannel) -> None:
+        if not await self.bot.check_logging_disable(channel.guild.id):
+            return
+
+        logging_channel = await self.permissions.logging_channel_check(channel.guild)
+        embed = Embed(
+            color=Color.red(),
+            timestamp=datetime.utcnow(),
+            description=f"Channel `{channel.name}` has been deleted.",
+        )
+        embed.set_author(name="Channel Deleted")
+        await logging_channel.send(embed=embed)
 
 
 def setup(bot: Bot) -> None:
