@@ -41,9 +41,7 @@ class TimeConverter(commands.Converter):
 
 
 class Misc(Cog):
-    """
-    Miscellaneous Commands of the Bot
-    """
+    """help Misc"""
 
     def __init__(self, client):
         self.client = client
@@ -490,8 +488,7 @@ class Misc(Cog):
 
     @suggest.group(name="approve")
     @commands.has_permissions(administrator=True)
-    async def approve_command(self, ctx, msgID: int):
-        msg = await ctx.fetch_message(msgID)
+    async def approve_command(self, ctx, msg: discord.Message):
         embed = msg.embeds[0]
         if embed is None:
             return
@@ -502,8 +499,7 @@ class Misc(Cog):
 
     @suggest.group(name="deny")
     @commands.has_permissions(administrator=True)
-    async def deny_command(self, ctx, msgID: int, *, reason: str):
-        msg = await ctx.fetch_message(msgID)
+    async def deny_command(self, ctx, msg: discord.Message, *, reason: str):
         embed = msg.embeds[0]
         if embed is None:
             return
